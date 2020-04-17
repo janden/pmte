@@ -1,25 +1,8 @@
 import numpy as np
 
 
-def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None, use_sinc=False):
-    if gen_fun is None:
-        rng = np.random.default_rng()
-        gen_fun = rng.standard_normal
-
+def concentration_op(mask, W=1/8, use_sinc=False):
     d = mask.ndim
-
-    # TODO: This W does not correspond to the W used in the paper, since this
-    # is the half-bandwidth. To get the W in the paper, multiply by 2.
-
-    W = np.array(W)
-    if W.ndim == 0:
-        W = W[np.newaxis]
-    if W.shape[0] == 1:
-        W = W.repeat(d)
-    elif W != d:
-        raise TypeError('Bandwidth W must have 1 or d elements.')
-    if any(W >= 0.5):
-        raise ValueError('Bandwidth W must be strictly smaller than 0.5.')
 
     sig_sz = mask.shape
     sig_len = np.prod(sig_sz)
@@ -44,8 +27,6 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None, use_sinc=False):
             sinc_kernel *= 2 * W[ell] * np.sinc(2 * W[ell] * grids[ell])
 
         freq_mask = np.fft.fftn(sinc_kernel, axes=range(-d, 0))
-
-    K = int(np.ceil(np.prod(2 * W) * np.sum(mask)))
 
     def _apply(x):
         x = np.reshape(x, x.shape[:1] + sig_sz)
@@ -92,12 +73,42 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None, use_sinc=False):
 
         return x
 
+    return _blocked_apply
+
+
+def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None, use_sinc=False):
+    if gen_fun is None:
+        rng = np.random.default_rng()
+        gen_fun = rng.standard_normal
+
+    d = mask.ndim
+
+    # TODO: This W does not correspond to the W used in the paper, since this
+    # is the half-bandwidth. To get the W in the paper, multiply by 2.
+
+    W = np.array(W)
+    if W.ndim == 0:
+        W = W[np.newaxis]
+    if W.shape[0] == 1:
+        W = W.repeat(d)
+    elif W != d:
+        raise TypeError('Bandwidth W must have 1 or d elements.')
+    if any(W >= 0.5):
+        raise ValueError('Bandwidth W must be strictly smaller than 0.5.')
+
+    sig_sz = mask.shape
+    sig_len = np.prod(sig_sz)
+
+    K = int(np.ceil(np.prod(2 * W) * np.sum(mask)))
+
+    op = concentration_op(mask, W=W, use_sinc=use_sinc)
+
     X = gen_fun((K + p, sig_len))
 
     # TODO: Shouldn't we do a QR here? Need to reduce the number of column
     # vectors in that case.
     for k in range(b):
-        X = _blocked_apply(X)
+        X = op(X)
 
     # Since the vectors are all row vectors, we need to consider the right
     # singular vectors.
