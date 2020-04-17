@@ -76,12 +76,28 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None, use_sinc=False):
 
         return x
 
+    def _blocked_apply(x):
+        block_size = 64
+
+        n = x.shape[0]
+
+        block_count = int(np.ceil(n / block_size))
+
+        for ell in range(block_count):
+            start = ell * block_size
+            stop = min((ell + 1) * block_size, n)
+            rng = range(start, stop)
+
+            x[rng] = _apply(x[rng])
+
+        return x
+
     X = gen_fun((K + p, sig_len))
 
     # TODO: Shouldn't we do a QR here? Need to reduce the number of column
     # vectors in that case.
     for k in range(b):
-        X = _apply(X)
+        X = _blocked_apply(X)
 
     # Since the vectors are all row vectors, we need to consider the right
     # singular vectors.
