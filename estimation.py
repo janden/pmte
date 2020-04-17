@@ -8,6 +8,9 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None):
 
     d = mask.ndim
 
+    # TODO: This W does not correspond to the W used in the paper, since this
+    # is the half-bandwidth. To get the W in the paper, multiply by 2.
+
     W = np.array(W)
     if W.ndim == 0:
         W = W[np.newaxis]
