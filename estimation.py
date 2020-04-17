@@ -164,7 +164,7 @@ def _ensure_W(W, d):
 
     if W.shape[0] == 1:
         W = W.repeat(d)
-    elif W != d:
+    elif W.shape[0] != d:
         raise TypeError('Bandwidth W must have 1 or d elements.')
 
     if any(W >= 0.5):
