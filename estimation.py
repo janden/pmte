@@ -75,7 +75,20 @@ def concentration_op(mask, W=1/8, use_sinc=False):
 
         return x
 
-    return _blocked_apply
+    def _reshaped_apply(x):
+        singleton = (x.ndim == 1)
+
+        if singleton:
+            x = x[np.newaxis, ...]
+
+        x = _blocked_apply(x)
+
+        if singleton:
+            x = x[0]
+
+        return x
+
+    return _reshaped_apply
 
 
 def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None, use_sinc=False):
