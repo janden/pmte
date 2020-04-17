@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None):
+def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None, use_sinc=False):
     if gen_fun is None:
         rng = np.random.default_rng()
         gen_fun = rng.standard_normal
@@ -24,22 +24,41 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None):
     sig_sz = mask.shape
     sig_len = np.prod(sig_sz)
 
-    rngs = [np.fft.fftfreq(sz) for sz in sig_sz]
-    grids = np.meshgrid(*rngs, indexing='ij')
+    if not use_sinc:
+        rngs = [np.fft.fftfreq(sz) for sz in sig_sz]
+        grids = np.meshgrid(*rngs, indexing='ij')
 
-    freq_mask = np.full(sig_sz, True)
+        freq_mask = np.full(sig_sz, True)
 
-    for ell in range(d):
-        freq_mask &= np.abs(grids[ell]) < W[ell]
+        for ell in range(d):
+            freq_mask &= np.abs(grids[ell]) < W[ell]
+    else:
+        two_sig_sz = tuple(2 * sz for sz in sig_sz)
 
-    K = int(np.ceil(np.sum(freq_mask) / sig_len * np.sum(mask)))
+        rngs = [sz * np.fft.fftfreq(sz) for sz in two_sig_sz]
+        grids = np.meshgrid(*rngs, indexing='ij')
 
-    # TODO: Does this actually apply T? Looks more like it applies a Dirichlet
-    # kernel since it just masks in the DFT domain.
+        sinc_kernel = np.ones(two_sig_sz)
+
+        for ell in range(d):
+            sinc_kernel *= 2 * W[ell] * np.sinc(2 * W[ell] * grids[ell])
+
+        freq_mask = np.fft.fftn(sinc_kernel, axes=range(-d, 0))
+
+    K = int(np.ceil(np.prod(2 * W) * np.sum(mask)))
+
     def _apply(x):
         x = np.reshape(x, x.shape[:1] + sig_sz)
 
         x = x * mask
+
+        if use_sinc:
+            y = np.zeros(x.shape[:1] + two_sig_sz)
+
+            ixgrid = np.ix_(range(x.shape[0]), *(range(sz) for sz in sig_sz))
+            y[ixgrid] = x
+
+            x = y
 
         xf = np.fft.fftn(x, axes=range(-d, 0))
 
@@ -47,6 +66,9 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None):
 
         x = np.fft.ifftn(xf, axes=range(-d, 0))
         x = np.real(x)
+
+        if use_sinc:
+            x = x[ixgrid]
 
         x = x * mask
 
