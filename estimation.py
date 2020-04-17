@@ -66,14 +66,16 @@ def concentration_op(mask, W=1/8, use_sinc=False):
 
         block_count = int(np.ceil(n / block_size))
 
+        y = np.empty_like(x)
+
         for ell in range(block_count):
             start = ell * block_size
             stop = min((ell + 1) * block_size, n)
             rng = range(start, stop)
 
-            x[rng] = _apply(x[rng])
+            y[rng] = _apply(x[rng])
 
-        return x
+        return y
 
     def _reshaped_apply(x):
         singleton = (x.ndim == 1)
