@@ -4,6 +4,8 @@ import numpy as np
 def concentration_op(mask, W=1/8, use_sinc=False):
     d = mask.ndim
 
+    W = _ensure_W(W, d)
+
     sig_sz = mask.shape
     sig_len = np.prod(sig_sz)
 
@@ -85,16 +87,7 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None, use_sinc=False):
 
     # TODO: This W does not correspond to the W used in the paper, since this
     # is the half-bandwidth. To get the W in the paper, multiply by 2.
-
-    W = np.array(W)
-    if W.ndim == 0:
-        W = W[np.newaxis]
-    if W.shape[0] == 1:
-        W = W.repeat(d)
-    elif W != d:
-        raise TypeError('Bandwidth W must have 1 or d elements.')
-    if any(W >= 0.5):
-        raise ValueError('Bandwidth W must be strictly smaller than 0.5.')
+    W = _ensure_W(W, d)
 
     sig_sz = mask.shape
     sig_len = np.prod(sig_sz)
@@ -148,3 +141,20 @@ def estimate_psd_rand_tapers(x, mask, W=1/8, p=5, b=3, gen_fun=None):
                  * estimate_psd_periodogram(x_tapered, d))
 
     return x_rt
+
+
+def _ensure_W(W, d):
+    W = np.array(W)
+
+    if W.ndim == 0:
+        W = W[np.newaxis]
+
+    if W.shape[0] == 1:
+        W = W.repeat(d)
+    elif W != d:
+        raise TypeError('Bandwidth W must have 1 or d elements.')
+
+    if any(W >= 0.5):
+        raise ValueError('Bandwidth W must be strictly smaller than 0.5.')
+
+    return W
