@@ -5,13 +5,12 @@ import util
 
 def main():
     N = 32
-    W = 0.1
+    W = 7 / 32
 
     g1d = np.fft.fftfreq(N)
     g1dp = np.fft.fftfreq(2 * N)
 
-    A = 1 / np.pi * np.sinc(np.pi * W * N
-                            * (g1d[np.newaxis, :] - g1d[:, np.newaxis]))
+    A = W * np.sinc(W * N * (g1d[np.newaxis, :] - g1d[:, np.newaxis]))
 
     D, _ = np.linalg.eig(A)
 
