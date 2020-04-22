@@ -1,5 +1,7 @@
 import numpy as np
 
+from scipy.fft import fftn, ifftn
+
 
 def concentration_op(mask, W=1/8, use_sinc=False):
     d = mask.ndim
@@ -28,7 +30,7 @@ def concentration_op(mask, W=1/8, use_sinc=False):
         for ell in range(d):
             sinc_kernel *= 2 * W[ell] * np.sinc(2 * W[ell] * grids[ell])
 
-        freq_mask = np.fft.fftn(sinc_kernel, axes=range(-d, 0))
+        freq_mask = fftn(sinc_kernel, axes=range(-d, 0), workers=-1)
 
     def _apply(x):
         x = np.reshape(x, x.shape[:1] + sig_sz)
@@ -43,11 +45,11 @@ def concentration_op(mask, W=1/8, use_sinc=False):
 
             x = y
 
-        xf = np.fft.fftn(x, axes=range(-d, 0))
+        xf = fftn(x, axes=range(-d, 0), workers=-1)
 
         xf = xf * freq_mask
 
-        x = np.fft.ifftn(xf, axes=range(-d, 0))
+        x = ifftn(xf, axes=range(-d, 0), workers=-1)
         x = np.real(x)
 
         if use_sinc:
