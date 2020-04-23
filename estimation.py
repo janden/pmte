@@ -1,12 +1,16 @@
 import numpy as np
 
 from scipy.fft import fftn, ifftn
+import pyfftw
 
 
-def concentration_op(mask, W=1/8, use_sinc=False):
+def concentration_op(mask, W=1/8, use_sinc=False, use_fftw=False):
     d = mask.ndim
 
     W = _ensure_W(W, d)
+
+    block_size = 64
+    n_threads = 8
 
     sig_sz = mask.shape
     sig_len = np.prod(sig_sz)
@@ -19,6 +23,8 @@ def concentration_op(mask, W=1/8, use_sinc=False):
 
         for ell in range(d):
             freq_mask &= np.abs(grids[ell]) < W[ell]
+
+        fft_sig_sz = sig_sz
     else:
         two_sig_sz = tuple(2 * sz for sz in sig_sz)
 
@@ -32,25 +38,56 @@ def concentration_op(mask, W=1/8, use_sinc=False):
 
         freq_mask = fftn(sinc_kernel, axes=range(-d, 0), workers=-1)
 
+        fft_sig_sz = two_sig_sz
+
+    if use_fftw:
+        in_array = pyfftw.empty_aligned((block_size,) + fft_sig_sz,
+                                         dtype='float64')
+        out_array = pyfftw.empty_aligned((block_size,) + fft_sig_sz[:-1]
+                                         + (fft_sig_sz[-1] // 2 + 1,),
+                                         dtype='complex128')
+
+        plan_forward = pyfftw.FFTW(in_array, out_array, axes=range(-d, 0),
+                                   direction='FFTW_FORWARD',
+                                   flags=('FFTW_MEASURE',),
+                                   threads=n_threads)
+
+        plan_backward = pyfftw.FFTW(out_array, in_array, axes=range(-d, 0),
+                                   direction='FFTW_BACKWARD',
+                                   flags=('FFTW_MEASURE',),
+                                   threads=n_threads)
+
+        freq_mask = freq_mask[..., :out_array.shape[-1]]
+
     def _apply(x):
         x = np.reshape(x, x.shape[:1] + sig_sz)
 
         x = x * mask
 
-        if use_sinc:
-            y = np.zeros(x.shape[:1] + two_sig_sz)
+        ixgrid = np.ix_(range(x.shape[0]), *(range(sz) for sz in sig_sz))
 
-            ixgrid = np.ix_(range(x.shape[0]), *(range(sz) for sz in sig_sz))
-            y[ixgrid] = x
+        if use_fftw:
+            in_array[:] = 0
+            in_array[ixgrid] = x
+            plan_forward()
 
-            x = y
+            # We have to use np.multiply here instead of out_array *= because
+            # otherwise Python assigns out_array to local scope instead of
+            # using the outer variable defined in concentration_op.
+            np.multiply(out_array, freq_mask, out=out_array)
 
-        xf = fftn(x, axes=range(-d, 0), workers=-1)
+            plan_backward()
+            x = in_array
+        else:
+            if use_sinc:
+                y = np.zeros(x.shape[:1] + two_sig_sz)
+                y[ixgrid] = x
+                x = y
 
-        xf = xf * freq_mask
-
-        x = ifftn(xf, axes=range(-d, 0), workers=-1)
-        x = np.real(x)
+            xf = fftn(x, axes=range(-d, 0), workers=-1)
+            xf = xf * freq_mask
+            x = ifftn(xf, axes=range(-d, 0), workers=-1)
+            x = np.real(x)
 
         if use_sinc:
             x = x[ixgrid]
@@ -62,8 +99,6 @@ def concentration_op(mask, W=1/8, use_sinc=False):
         return x
 
     def _blocked_apply(x):
-        block_size = 64
-
         n = x.shape[0]
 
         block_count = int(np.ceil(n / block_size))
