@@ -130,7 +130,8 @@ def concentration_op(mask, W=1/8, use_sinc=False, use_fftw=False):
     return _reshaped_apply
 
 
-def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None, use_sinc=False):
+def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None, use_sinc=False,
+                     use_fftw=False):
     if gen_fun is None:
         rng = np.random.default_rng()
         gen_fun = rng.standard_normal
@@ -146,7 +147,7 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None, use_sinc=False):
 
     K = int(np.ceil(np.prod(2 * W) * np.sum(mask)))
 
-    op = concentration_op(mask, W=W, use_sinc=use_sinc)
+    op = concentration_op(mask, W=W, use_sinc=use_sinc, use_fftw=use_fftw)
 
     X = gen_fun((K + p, sig_len))
 
