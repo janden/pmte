@@ -150,16 +150,23 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, gen_fun=None, use_sinc=False,
     op = concentration_op(mask, W=W, use_sinc=use_sinc, use_fftw=use_fftw)
 
     X = gen_fun((K + p, sig_len))
+    if p == 0:
+        X = np.linalg.qr(X.T, 'reduced')[0].T
 
     # TODO: Shouldn't we do a QR here? Need to reduce the number of column
     # vectors in that case.
     for k in range(b):
         X = op(X)
+        if p == 0:
+            X = np.linalg.qr(X.T, 'reduced')[0].T
 
-    # Since the vectors are all row vectors, we need to consider the right
-    # singular vectors.
-    _, S, V = np.linalg.svd(X, full_matrices=False)
-    V = V[:K]
+    if p > 0:
+        # Since the vectors are all row vectors, we need to consider the right
+        # singular vectors.
+        _, S, V = np.linalg.svd(X, full_matrices=False)
+        V = V[:K]
+    else:
+        V = X
 
     V = np.reshape(V, (K,) + sig_sz)
 
