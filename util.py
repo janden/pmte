@@ -37,3 +37,9 @@ def subspace_dist(X, Y):
     theta = np.max(subspace_angles(X.T, Y.T))
 
     return np.sin(theta)
+
+
+def load_float32(fname):
+    with open(fname, 'rb') as f:
+        buf = f.read()
+    return np.frombuffer(buf, dtype=np.float32)
