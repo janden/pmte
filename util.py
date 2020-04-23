@@ -21,10 +21,10 @@ def write_gplt_binary_matrix(filename, A, lab1=None, lab2=None):
     M[0, 0] = A.shape[1]
     M[1:, 0] = lab2
     M[0, 1:] = lab1
-    M[1:, 1:] = np.flipud(A).T
+    M[1:, 1:] = np.fliplr(A).T
 
     with open(filename, 'wb') as f:
-        f.write(M.T.astype(np.float32).tobytes())
+        f.write(M.astype(np.float32).tobytes())
 
 
 def cos_max_principal_angle(X, Y):
