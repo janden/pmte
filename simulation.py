@@ -36,6 +36,6 @@ def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, gen_fun=None):
 
         ixgrid = np.ix_(range(n_block), *(range(sz) for sz in sig_sz))
 
-        x[ell * block_size: ell * block_size + n] = x_block[ixgrid]
+        x[ell * block_size: ell * block_size + n_block] = x_block[ixgrid]
 
     return x
