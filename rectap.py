@@ -20,9 +20,9 @@ def main():
 
     W = R1
 
-    # In the MATLAB version, we manually set K = 11 ** 2 to ensure proper
-    # correspondence with tensor tapers. Might have to do the same here.
-    tapers = estimation.calc_rand_tapers(recmask2, W, p=0, b=8,
+    K = int(np.ceil(np.sqrt(np.sum(recmask2)) * 2 * W)) ** 2
+
+    tapers = estimation.calc_rand_tapers(recmask2, W, p=0, b=8, K=K,
                                          gen_fun=gen_fun, use_sinc=True,
                                          use_fftw=True)
 
