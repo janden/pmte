@@ -28,15 +28,15 @@ def main():
 
     fname = 'data/rectap1.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tapers[0, :, :])
+    util.write_gplt_binary_matrix(fname, tapers[0, :, :].T)
 
     fname = 'data/rectap2.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tapers[1, :, :])
+    util.write_gplt_binary_matrix(fname, tapers[1, :, :].T)
 
     fname = 'data/rectap17.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tapers[16, :, :])
+    util.write_gplt_binary_matrix(fname, tapers[16, :, :].T)
 
 
 if __name__ == '__main__':
