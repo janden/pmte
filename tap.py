@@ -24,6 +24,8 @@ def main():
                                          gen_fun=gen_fun, use_sinc=True,
                                          use_fftw=True)
 
+    inten = estimation.taper_intensity(tapers)
+
     fname = 'data/tap1.bin'
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, tapers[0, :, :].T)
@@ -35,6 +37,10 @@ def main():
     fname = 'data/tap17.bin'
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, tapers[16, :, :].T)
+
+    fname = 'data/inten.bin'
+    util.ensure_dir_exists(fname)
+    util.write_gplt_binary_matrix(fname, inten.T)
 
 
 if __name__ == '__main__':

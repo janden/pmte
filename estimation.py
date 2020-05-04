@@ -204,6 +204,19 @@ def estimate_psd_rand_tapers(x, mask, W=1/8, p=5, b=3, gen_fun=None):
     return x_rt
 
 
+def taper_intensity(tapers):
+    d = tapers.ndim - 1
+
+    tapers = np.fft.ifftshift(tapers, axes=range(-d, 0))
+    tapers_f = fftn(tapers, axes=range(-d, 0), workers=-1)
+    tapers_f = np.fft.fftshift(tapers_f, axes=range(-d, 0))
+
+    inten = np.sum(np.abs(tapers_f) ** 2, axis=0)
+    inten /= np.prod(tapers.shape[1:])
+
+    return inten
+
+
 def _ensure_W(W, d):
     W = np.array(W)
 

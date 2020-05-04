@@ -2,6 +2,7 @@ import numpy as np
 from scipy.signal.windows import dpss
 
 import util
+import estimation
 
 
 def slepian_tapers(n, W):
@@ -52,6 +53,8 @@ def main():
 
     tentapers[mid - ext1:mid + ext2, mid - ext1:mid + ext2, :] = tapers.real
 
+    inten = estimation.taper_intensity(tentapers.T).T
+
     fname = 'data/tentap1.bin'
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, tentapers[:, :, 0])
@@ -63,6 +66,10 @@ def main():
     fname = 'data/tentap17.bin'
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, tentapers[:, :, 16])
+
+    fname = 'data/teninten.bin'
+    util.ensure_dir_exists(fname)
+    util.write_gplt_binary_matrix(fname, inten)
 
 
 if __name__ == '__main__':
