@@ -204,6 +204,22 @@ def estimate_psd_rand_tapers(x, mask, W=1/8, p=5, b=3, gen_fun=None):
     return x_rt
 
 
+def estimate_psd_tapers(x, tapers):
+    d = tapers.ndim - 1
+
+    sig_sz = tapers.shape[-d:]
+    taper_len = tapers.shape[0]
+
+    x_mt = np.zeros_like(x, dtype=tapers.dtype)
+
+    for taper in tapers:
+        x_tapered = x * taper
+
+        x_mt += (1 / taper_len * np.prod(sig_sz)
+                 * estimate_psd_periodogram(x_tapered, d))
+
+    return x_mt
+
 def taper_intensity(tapers):
     d = tapers.ndim - 1
 
