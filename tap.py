@@ -51,6 +51,11 @@ def main():
     sqrtdensity = sqrtdensity(xi2, xi1)
     density = sqrtdensity ** 2
 
+    fname = 'data/density.bin'
+    util.ensure_dir_exists(fname)
+    util.write_gplt_binary_matrix(fname, density.T)
+
+    gen_fun = compat.oct_randn()
     signal = gen_fun((N, N))
     signal = util.centered_ifftn(sqrtdensity * util.centered_fftn(signal, 2), 2)
 
