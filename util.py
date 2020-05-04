@@ -43,3 +43,19 @@ def load_float32(fname):
     with open(fname, 'rb') as f:
         buf = f.read()
     return np.frombuffer(buf, dtype=np.float32)
+
+
+def centered_fftn(x, d):
+    x = np.fft.ifftshift(x, axes=range(-d, 0))
+    x = np.fft.fftn(x, axes=range(-d, 0))
+    x = np.fft.fftshift(x, axes=range(-d, 0))
+
+    return x
+
+
+def centered_ifftn(x, d):
+    x = np.fft.ifftshift(x, axes=range(-d, 0))
+    x = np.fft.ifftn(x, axes=range(-d, 0))
+    x = np.fft.fftshift(x, axes=range(-d, 0))
+
+    return x
