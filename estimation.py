@@ -185,21 +185,9 @@ def estimate_psd_periodogram(x, d):
 
 
 def estimate_psd_rand_tapers(x, mask, W=1/8, p=5, b=3, gen_fun=None):
-    d = mask.ndim
-
-    sig_sz = mask.shape
-
     h = calc_rand_tapers(mask, W=W, p=p, b=b, gen_fun=gen_fun)
 
-    taper_len = h.shape[0]
-
-    x_rt = np.zeros_like(x)
-
-    for h_m in h:
-        x_tapered = x * h_m
-
-        x_rt += (1 / taper_len * np.prod(sig_sz)
-                 * estimate_psd_periodogram(x_tapered, d))
+    x_rt = estimate_psd_tapers(x, h)
 
     return x_rt
 
