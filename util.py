@@ -1,4 +1,5 @@
 import os
+import gzip
 
 import numpy as np
 
@@ -59,3 +60,19 @@ def centered_ifftn(x, d):
     x = np.fft.fftshift(x, axes=range(-d, 0))
 
     return x
+
+
+def load_images():
+    filename = 'signal.bin'
+    dtype = np.uint8
+    shape = (1000, 128, 128)
+
+    with open(filename, 'rb') as f:
+        buf = f.read()
+    buf = gzip.decompress(buf)
+
+    im = np.frombuffer(buf, dtype=dtype)
+    im = im.reshape(shape)
+    im = im.astype(np.float32)
+
+    return im
