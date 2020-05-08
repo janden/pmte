@@ -62,10 +62,13 @@ def centered_ifftn(x, d):
     return x
 
 
-def load_images():
+def load_images(n=1000):
     filename = 'signal.bin'
     dtype = np.uint8
     shape = (1000, 128, 128)
+
+    if n > shape[0]:
+        raise RuntimeError('n must be smaller than %d.' % shape[0])
 
     with open(filename, 'rb') as f:
         buf = f.read()
@@ -74,5 +77,7 @@ def load_images():
     im = np.frombuffer(buf, dtype=dtype)
     im = im.reshape(shape)
     im = im.astype(np.float32)
+
+    im = im[:n]
 
     return im
