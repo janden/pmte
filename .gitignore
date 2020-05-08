@@ -3,3 +3,5 @@ data/
 
 *.png
 *.npy
+
+signal.bin
