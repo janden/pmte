@@ -1,6 +1,7 @@
 import numpy as np
 
 from scipy.fft import fftn, ifftn
+from scipy.signal.windows import dpss
 import pyfftw
 
 
@@ -129,6 +130,38 @@ def concentration_op(mask, W=1/8, use_sinc=False, use_fftw=False):
 
     return _reshaped_apply
 
+
+def calc_tensor_tapers(sig_shape, W=1/8):
+    if not isinstance(sig_shape, tuple):
+        sig_shape = (sig_shape, )
+
+    d = len(sig_shape)
+
+    W = _ensure_W(W, d)
+
+    h = np.ones((1,) * (2 * d), dtype=np.float64)
+
+    K = np.round(2 * np.array(sig_shape) * W).astype('int')
+
+    for ell in range(d):
+        h_ell = dpss(sig_shape[ell], sig_shape[ell] * W[ell], Kmax=K[ell], norm=2)
+
+        # Move first and second axes into ellth and (d + ell)th,
+        # respectively.
+        new_axes = (tuple(range(0, ell))
+                    + tuple(range(ell + 1, d))
+                    + tuple(range(d, d + ell))
+                    + tuple(range(d + ell + 1, 2 * d)))
+        h_ell = np.expand_dims(h_ell, new_axes)
+
+        h = h * h_ell
+
+    taper_shape = h.shape[:d]
+    taper_len = np.prod(taper_shape)
+
+    h = np.reshape(h, (taper_len, ) + sig_shape)
+
+    return h
 
 def calc_rand_tapers(mask, W=1/8, p=5, b=3, K=None, gen_fun=None,
                      use_sinc=False, use_fftw=False):
