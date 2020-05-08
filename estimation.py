@@ -163,6 +163,43 @@ def calc_tensor_tapers(sig_shape, W=1/8):
 
     return h
 
+
+def calc_corner_tapers(mask, W=1/8):
+    d = mask.ndim
+
+    if not d == 2:
+        raise RuntimeError('Only implemented for 2D signals.')
+
+    N1, N2, N3, N4 = _fit_corner_mask(mask)
+
+    tapers1 = calc_tensor_tapers((N1,) * 2, W=W)
+    tapers2 = calc_tensor_tapers((N2,) * 2, W=W)
+    tapers3 = calc_tensor_tapers((N3,) * 2, W=W)
+    tapers4 = calc_tensor_tapers((N4,) * 2, W=W)
+
+    taper_len = (tapers1.shape[0]
+                 + tapers2.shape[0]
+                 + tapers3.shape[0]
+                 + tapers4.shape[0])
+
+    tapers = np.zeros((taper_len,) + mask.shape, dtype=tapers1.dtype)
+
+    idx = 0
+
+    tapers[idx:idx + tapers1.shape[0], :N1, :N1] = tapers1
+    idx += tapers1.shape[0]
+
+    tapers[idx:idx + tapers2.shape[0], -N2:, :N2] = tapers2
+    idx += tapers2.shape[0]
+
+    tapers[idx:idx + tapers3.shape[0], -N3:, -N3:] = tapers3
+    idx += tapers3.shape[0]
+
+    tapers[idx:idx + tapers4.shape[0], :N4, -N4:] = tapers4
+
+    return tapers
+
+
 def calc_rand_tapers(mask, W=1/8, p=5, b=3, K=None, gen_fun=None,
                      use_sinc=False, use_fftw=False):
     if gen_fun is None:
@@ -270,3 +307,17 @@ def _ensure_W(W, d):
         raise ValueError('Bandwidth W must be strictly smaller than 0.5.')
 
     return W
+
+
+def _fit_corner_mask(mask):
+    last_true = lambda x: np.argmax(~x)
+
+    # Side lengths of squares fitting in the top left, bottom left, bottom
+    # right, and top right corners of the mask.
+
+    N1 = last_true(np.diag(mask))
+    N2 = last_true(np.diag(np.flip(mask, 0)))
+    N3 = last_true(np.diag(np.flip(mask, (0, 1))))
+    N4 = last_true(np.diag(np.flip(mask, 1)))
+
+    return (N1, N2, N3, N4)
