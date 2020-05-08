@@ -198,7 +198,8 @@ def estimate_psd_tapers(x, tapers):
     sig_sz = tapers.shape[-d:]
     taper_len = tapers.shape[0]
 
-    x_mt = np.zeros_like(x, dtype=tapers.dtype)
+    real_dtype = np.real(x.ravel()[0]).dtype
+    x_mt = np.zeros_like(x, dtype=real_dtype)
 
     for taper in tapers:
         x_tapered = x * taper
