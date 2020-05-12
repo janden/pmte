@@ -14,7 +14,9 @@ def main():
 
     W = 1 / 16
 
-    mask_r = 56 / 128
+    mask_rs = np.arange(28, 76 + 1, 4) / 128
+
+    do_print = True
 
     g1d = np.arange(-N // 2, N // 2) / N
     x1, x2 = np.meshgrid(g1d, g1d)
@@ -30,9 +32,7 @@ def main():
 
     sig = util.load_images(n)
 
-    x = (x + 1 / 4 * sig).astype(sig.dtype)
-
-    mask = (r >= mask_r)
+    x = (x + 43.5 / 4 * sig).astype(sig.dtype)
 
     psd_true = psd_fun(np.fft.fftshift(r, axes=(-2, -1)))
 
@@ -45,33 +45,78 @@ def main():
     def variance(psd_est):
         return np.mean(np.abs(psd_est - np.mean(psd_est, axis=0)) ** 2)
 
-    xm = x * mask
+    mses_mper = []
+    variances_mper = []
+    biases_mper = []
 
-    x_mper = estimation.estimate_psd_periodogram(xm, 2)
-    x_mper *= N ** 2 / np.sum(mask)
+    mses_cmt = []
+    variances_cmt = []
+    biases_cmt = []
 
-    mse_mper = mse(x_mper)
-    bias_mper = bias(x_mper)
-    variance_mper = variance(x_mper)
+    mses_rt = []
+    variances_rt = []
+    biases_rt = []
 
-    print('%-20s%15e%15e%15e' % ('Masked periodogram', mse_mper, bias_mper, variance_mper))
+    for mask_r in mask_rs:
+        mask = (r >= mask_r)
 
-    x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W, gen_fun=gen_fun)
+        xm = x * mask
 
-    mse_rt = mse(x_rt)
-    bias_rt = bias(x_rt)
-    variance_rt = variance(x_rt)
+        x_mper = estimation.estimate_psd_periodogram(xm, 2)
+        x_mper *= N ** 2 / np.sum(mask)
 
-    print('%-20s%15e%15e%15e' % ('Randomtaper', mse_rt, bias_rt, variance_rt))
+        mse_mper = mse(x_mper)
+        bias_mper = bias(x_mper)
+        variance_mper = variance(x_mper)
 
-    tapers = estimation.calc_corner_tapers(mask, W=W)
-    x_cmt = estimation.estimate_psd_tapers(x, tapers)
+        mses_mper.append(mse_mper)
+        variances_mper.append(variance_mper)
+        biases_mper.append(bias_mper)
 
-    mse_cmt = mse(x_cmt)
-    bias_cmt = bias(x_cmt)
-    variance_cmt = variance(x_cmt)
+        if do_print:
+            print('%-20s%15e%15e%15e' % ('Masked periodogram', mse_mper, bias_mper, variance_mper))
 
-    print('%-20s%15e%15e%15e' % ('Corner multitaper', mse_cmt, bias_cmt, variance_cmt))
+        x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W, gen_fun=gen_fun)
+
+        mse_rt = mse(x_rt)
+        bias_rt = bias(x_rt)
+        variance_rt = variance(x_rt)
+
+        mses_rt.append(mse_rt)
+        variances_rt.append(variance_rt)
+        biases_rt.append(bias_rt)
+
+        if do_print:
+            print('%-20s%15e%15e%15e' % ('Randomtaper', mse_rt, bias_rt, variance_rt))
+
+        tapers = estimation.calc_corner_tapers(mask, W=W)
+        x_cmt = estimation.estimate_psd_tapers(x, tapers)
+
+        mse_cmt = mse(x_cmt)
+        bias_cmt = bias(x_cmt)
+        variance_cmt = variance(x_cmt)
+
+        mses_cmt.append(mse_cmt)
+        variances_cmt.append(variance_cmt)
+        biases_cmt.append(bias_cmt)
+
+        if do_print:
+            print('%-20s%15e%15e%15e' % ('Corner multitaper', mse_cmt, bias_cmt, variance_cmt))
+
+    with open('data/cryo_sim.csv', 'w') as f:
+        for k in range(len(mask_rs)):
+            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), biases_mper[k],
+                                       biases_cmt[k], biases_rt[k]))
+        f.write('\n\n')
+
+        for k in range(len(mask_rs)):
+            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), variances_mper[k],
+                                       variances_cmt[k], variances_rt[k]))
+        f.write('\n\n')
+
+        for k in range(len(mask_rs)):
+            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), mses_mper[k],
+                                       mses_cmt[k], mses_rt[k]))
 
 
 if __name__ == '__main__':

@@ -76,7 +76,7 @@ def load_images(n=1000):
 
     im = np.frombuffer(buf, dtype=dtype)
     im = im.reshape(shape)
-    im = im.astype(np.float32)
+    im = im.astype(np.float32) / 255
 
     im = im[:n]
 
