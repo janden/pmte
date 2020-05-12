@@ -262,6 +262,16 @@ def estimate_psd_rand_tapers(x, mask, W=1/8, p=5, b=3, gen_fun=None):
     return x_rt
 
 
+def estimate_psd_multitaper(x, d, W=1/8):
+    shape = x.shape[-d:]
+
+    h = calc_tensor_tapers(shape, W=W)
+
+    x_mt = estimate_psd_tapers(x, h)
+
+    return x_mt
+
+
 def estimate_psd_tapers(x, tapers):
     d = tapers.ndim - 1
 
