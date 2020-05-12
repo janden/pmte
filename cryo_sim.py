@@ -30,7 +30,7 @@ def main():
             psd_fun=lambda x, y: psd_fun(np.hypot(x, y)),
             gen_fun=gen_fun)
 
-    sig = util.load_images(n)
+    sig = util.load_sim_images(n)
 
     x = (x + 43.5 / 4 * sig).astype(sig.dtype)
 

@@ -62,7 +62,7 @@ def centered_ifftn(x, d):
     return x
 
 
-def load_images(n=1000):
+def load_sim_images(n=1000):
     filename = 'signal.bin'
     dtype = np.uint8
     shape = (1000, 128, 128)
