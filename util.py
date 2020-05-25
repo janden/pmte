@@ -81,3 +81,24 @@ def load_sim_images(n=1000):
     im = im[:n]
 
     return im
+
+
+def load_exp_images(n=1024):
+    filename = 'first1024.mat'
+
+    from scipy.io import loadmat
+
+    f = loadmat(filename)
+
+    im = f['im'].T
+    proj = f['proj'].T
+    groups = f['groups'][0]
+
+    if n > im.shape[0]:
+        raise RuntimeError('n must be smaller than %d.' % im.shape[0])
+
+    im = im[:n]
+    proj = proj[:n]
+    groups = groups[:n]
+
+    return im, proj, groups
