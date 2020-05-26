@@ -18,6 +18,8 @@ def main():
     qr_period = 32
     save_period = 128
 
+    error_type = 'trace_norm'
+
     X, Y = np.meshgrid(np.arange(-N / 2, N / 2), np.arange(-N / 2, N / 2))
     R = np.hypot(X, Y)
 
@@ -43,7 +45,7 @@ def main():
     gen_fun = rng.standard_normal
     X = gen_fun((K, N ** 2))
 
-    thetas = []
+    errs = []
 
     for k in range(0, 5120 + 1):
         X_prev = X
@@ -57,21 +59,25 @@ def main():
         print('[k=%04d] timing = %.2g, %.2g' % (k, t1-t0, t2-t1))
 
         if k > 0 and k % qr_period == 0:
-            theta = np.max(subspace_angles(X.T, X_prev.T))
+            angles = subspace_angles(X.T, X_prev.T)
+            theta = np.max(angles)
 
-            print('[k=%04d] error = %.15g' % (k, np.sin(theta)))
+            if error_type == 'operator_norm':
+                error = np.sin(theta)
+            elif error_type == 'trace_norm':
+                error = np.mean(np.sin(angles))
 
-            if len(thetas) > 0:
-                print('[k=%04d] rate = %.15g' % (k, theta / thetas[-1]))
+            print('[k=%04d] error = %.15g' % (k, error))
 
-            thetas.append(theta)
+            if len(errs) > 0:
+                print('[k=%04d] rate = %.15g' % (k, error / errs[-1]))
+
+            errs.append(error)
 
         if k % save_period == 0:
             np.save('subspace_%04d.npy' % k, X)
 
-    thetas = np.array(thetas)
-
-    err = np.sin(thetas)
+    err = np.array(errs)
 
     if len(err) >= 2:
         if all(err > 1e-10):
@@ -83,10 +89,10 @@ def main():
         print('%-30s%.15g' % ('Asymptotic rate:', asymp_rate))
 
         plt.figure()
-        plt.semilogy(np.sin(thetas))
+        plt.semilogy(qr_period * np.arange(1, len(err) + 1), err)
         plt.title('N = 128, R = 8, W = 1/8, K = %d' % K)
-        plt.ylabel('sin(θ)')
-        plt.xlabel('t')
+        plt.ylabel('Error')
+        plt.xlabel('Iteration (t)')
         plt.savefig('conv_K=%d.png' % K)
         plt.show()
 
