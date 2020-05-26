@@ -1,8 +1,18 @@
 import numpy as np
 
+from scipy.signal.windows import dpss
+
 import estimation
 import compat
 import util
+
+
+def slepian_tapers(n, W):
+    V, E = dpss(n, n * W, Kmax=n, norm=2, return_ratios=True)
+    V = V.T
+
+    return V, E
+
 
 def main():
     N = 128
@@ -22,27 +32,27 @@ def main():
 
     K = int(np.ceil(np.sqrt(np.sum(recmask2)) * 2 * W)) ** 2
 
-    tapers = estimation.calc_rand_tapers(recmask2, W, p=0, b=8, K=K,
-                                         gen_fun=gen_fun, use_sinc=True,
-                                         use_fftw=True)
+    rectapers = estimation.calc_rand_tapers(recmask2, W, p=0, b=72, K=K,
+                                            gen_fun=gen_fun, use_sinc=True,
+                                            use_fftw=True)
 
-    inten = estimation.taper_intensity(tapers)
+    recinten = estimation.taper_intensity(rectapers)
 
     fname = 'data/rectap1.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tapers[0, :, :].T)
+    util.write_gplt_binary_matrix(fname, rectapers[0, :, :].T)
 
     fname = 'data/rectap2.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tapers[1, :, :].T)
+    util.write_gplt_binary_matrix(fname, rectapers[1, :, :].T)
 
     fname = 'data/rectap17.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tapers[16, :, :].T)
+    util.write_gplt_binary_matrix(fname, rectapers[16, :, :].T)
 
     fname = 'data/recinten.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, inten.T)
+    util.write_gplt_binary_matrix(fname, recinten.T)
 
     sqrtdensity = lambda xi1, xi2: \
         np.exp(-40 * (xi1 - 0.20) ** 2 - 20 * (xi2 - 0.25) ** 2) \
@@ -57,17 +67,78 @@ def main():
     signal = gen_fun((N, N))
     signal = util.centered_ifftn(sqrtdensity * util.centered_fftn(signal, 2), 2)
 
-    multiestim = estimation.estimate_psd_tapers(signal, tapers)
-    multiestim = np.fft.fftshift(multiestim, axes=(-2, -1))
+    recmultiestim = estimation.estimate_psd_tapers(signal, rectapers)
+    recmultiestim = np.fft.fftshift(recmultiestim, axes=(-2, -1))
 
     fname = 'data/recmt.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, multiestim.T)
+    util.write_gplt_binary_matrix(fname, recmultiestim.T)
 
-    error = (np.sum(np.abs(density.ravel() - multiestim.ravel()) ** 2)
-            / np.sum(np.abs(density.ravel()) ** 2))
+    recerror = np.sqrt(np.sum(np.abs(density.ravel() - recmultiestim.ravel()) ** 2)
+                       / np.sum(np.abs(density.ravel()) ** 2))
 
-    print(error)
+    print('recerror = %g' % recerror)
+
+    N_tensor = int(np.floor(2 * R2 * N))
+    tapers, _ = slepian_tapers(N_tensor, R1)
+
+    K = int(np.round(2 * N_tensor * R1))
+
+    tapers = tapers[:, :K]
+
+    tapers = (tapers[:, np.newaxis, :, np.newaxis]
+              * tapers[np.newaxis, :, np.newaxis, :])
+
+    tapers = np.reshape(tapers, (N_tensor, N_tensor, -1))
+
+    tentapers = np.zeros((N, N, tapers.shape[2]))
+
+    mid = int(np.ceil((N + 1) / 2) - 1)
+    ext1 = int(np.ceil((N_tensor - 1) / 2))
+    ext2 = int(np.floor((N_tensor - 1) / 2) + 1)
+
+    tentapers[mid - ext1:mid + ext2, mid - ext1:mid + ext2, :] = tapers.real
+
+    teninten = estimation.taper_intensity(tentapers.T).T
+
+    fname = 'data/tentap1.bin'
+    util.ensure_dir_exists(fname)
+    util.write_gplt_binary_matrix(fname, tentapers[:, :, 0])
+
+    fname = 'data/tentap2.bin'
+    util.ensure_dir_exists(fname)
+    util.write_gplt_binary_matrix(fname, tentapers[:, :, 1])
+
+    fname = 'data/tentap17.bin'
+    util.ensure_dir_exists(fname)
+    util.write_gplt_binary_matrix(fname, tentapers[:, :, 16])
+
+    fname = 'data/teninten.bin'
+    util.ensure_dir_exists(fname)
+    util.write_gplt_binary_matrix(fname, teninten)
+
+    tenmultiestim = estimation.estimate_psd_tapers(signal, tentapers.T)
+    tenmultiestim = np.fft.fftshift(tenmultiestim, axes=(-2, -1))
+
+    fname = 'data/tenmt.bin'
+    util.ensure_dir_exists(fname)
+    util.write_gplt_binary_matrix(fname, tenmultiestim.T)
+
+    tenerror = np.sqrt(np.sum(np.abs(density.ravel() - tenmultiestim.ravel()) ** 2)
+                       / np.sum(np.abs(density.ravel()) ** 2))
+
+    print('tenerror = %g' % tenerror)
+
+    deviation = np.sqrt(np.sum(np.abs(tenmultiestim.ravel() - recmultiestim.ravel()) ** 2)
+                        / np.sum(np.abs(tenmultiestim.ravel()) ** 2))
+
+    print('deviation = %g' % deviation)
+
+    from scipy.linalg import subspace_angles
+    angles = subspace_angles(tentapers.reshape((-1, tentapers.shape[-1])),
+            rectapers.T.reshape((-1, rectapers.shape[0])))
+    print('operator norm error = %g' % np.sin(np.max(angles)))
+    print('trace norm error = %g' % np.mean(np.sin(angles)))
 
 
 if __name__ == '__main__':
