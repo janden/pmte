@@ -201,6 +201,8 @@ def calc_error():
     max_iter = 5120
     step = 128
 
+    error_type = 'trace_norm'
+
     lams = load_spectrum()
     X0 = np.load(fname % max_iter)
 
@@ -220,14 +222,20 @@ def calc_error():
     plt.xlim((lams_range[len(lams) // 2 - 32], lams_range[len(lams) // 2 + 32]))
     plt.savefig('spectrum_zoom.png')
 
-    if False:
+    if True:
         err = np.empty(max_iter // step + 1)
 
         for k in range(0, max_iter // step + 1):
             X = np.load(fname % (k * step))
 
-            theta = np.max(subspace_angles(X.T, X0.T))
-            err[k] = np.sin(theta)
+            angles = subspace_angles(X.T, X0.T)
+
+            if error_type == 'operator_norm':
+                error = np.sin(np.max(angles))
+            elif error_type == 'trace_norm':
+                error = np.mean(np.sin(angles))
+
+            err[k] = error
 
         fname = 'data/errors.csv'
 
@@ -253,7 +261,7 @@ def calc_error():
     plt.semilogy(it, err, 'o-', label='error')
     plt.semilogy(it, bound0, 's-', label='bound')
     plt.title('Subspace distance as a function of iteration')
-    plt.ylabel('sin(θ)')
+    plt.ylabel('Error')
     plt.xlabel('t')
     plt.legend()
     plt.savefig('conv.png')
