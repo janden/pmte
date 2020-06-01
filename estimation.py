@@ -248,24 +248,22 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, K=None, gen_fun=None,
 
     return V
 
-
 def estimate_psd_periodogram(x, d):
     sig_sz = x.shape[-d:]
 
-    xf = np.fft.fftn(x, axes=range(-d, 0))
+    xf = fftn(x, axes=range(-d, 0), workers=-1)
 
-    x_per = 1 / np.prod(sig_sz) * np.abs(xf) ** 2
+    x_per = 1 / np.prod(sig_sz) * (xf.real ** 2 + xf.imag ** 2)
 
     return x_per
 
 
 def estimate_psd_rand_tapers(x, mask, W=1/8, p=5, b=3, gen_fun=None):
-    h = calc_rand_tapers(mask, W=W, p=p, b=b, gen_fun=gen_fun)
+    h = calc_rand_tapers(mask, W=W, p=p, b=b, gen_fun=gen_fun, use_fftw=True)
 
     x_rt = estimate_psd_tapers(x, h)
 
     return x_rt
-
 
 def estimate_psd_multitaper(x, d, W=1/8):
     shape = x.shape[-d:]
@@ -289,8 +287,11 @@ def estimate_psd_tapers(x, tapers):
     for taper in tapers:
         x_tapered = x * taper
 
-        x_mt += (1 / taper_len * np.prod(sig_sz)
-                 * estimate_psd_periodogram(x_tapered, d))
+        x_tapered_f = fftn(x_tapered, axes=range(-d, 0), workers=-1)
+
+        x_mt += x_tapered_f.real ** 2 + x_tapered_f.imag ** 2
+
+    x_mt /= taper_len
 
     return x_mt
 
