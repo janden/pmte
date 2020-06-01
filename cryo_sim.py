@@ -36,6 +36,21 @@ def main():
 
     psd_true = psd_fun(np.fft.fftshift(r, axes=(-2, -1)))
 
+    util.write_gplt_binary_matrix('data/cryo_sim_sig1.bin', sig[0])
+    util.write_gplt_binary_matrix('data/cryo_sim_sig2.bin', sig[1])
+    util.write_gplt_binary_matrix('data/cryo_sim_sig_noise1.bin', x[0])
+    util.write_gplt_binary_matrix('data/cryo_sim_sig_noise2.bin', x[1])
+    util.write_gplt_binary_matrix('data/cryo_sim_psd.bin',
+                                  np.fft.ifftshift(psd_true, axes=(-2, -1)))
+
+    mask_r = 60 / 128
+    mask = (r >= mask_r)
+    util.write_gplt_binary_matrix('data/cryo_sim_mask.bin', mask)
+
+    corner_tapers = estimation.calc_corner_tapers(mask, W=W)
+    corner_mask = np.any(np.abs(corner_tapers) > 0, axis=0)
+    util.write_gplt_binary_matrix('data/cryo_sim_mask_grid.bin', mask)
+
     def mse(psd_est):
         return np.mean(np.abs(psd_est - psd_true) ** 2)
 
