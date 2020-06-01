@@ -90,8 +90,7 @@ def concentration_op(mask, W=1/8, use_sinc=False, use_fftw=False):
             x = ifftn(xf, axes=range(-d, 0), workers=-1)
             x = np.real(x)
 
-        if use_sinc:
-            x = x[ixgrid]
+        x = x[ixgrid]
 
         x = x * mask
 
