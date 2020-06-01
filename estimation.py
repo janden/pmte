@@ -143,7 +143,13 @@ def calc_tensor_tapers(sig_shape, W=1/8):
     K = np.round(2 * np.array(sig_shape) * W).astype('int')
 
     for ell in range(d):
-        h_ell = dpss(sig_shape[ell], sig_shape[ell] * W[ell], Kmax=K[ell], norm=2)
+        if K[ell] > 0:
+            h_ell = dpss(sig_shape[ell], sig_shape[ell] * W[ell],
+                         Kmax=K[ell], norm=2)
+        else:
+            # If K is too small, just use constant taper (so we get the
+            # periodogram).
+            h_ell = 1 / np.sqrt(sig_shape[ell]) * np.ones((1, sig_shape[ell]))
 
         # Move first and second axes into ellth and (d + ell)th,
         # respectively.
