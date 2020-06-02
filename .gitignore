@@ -4,4 +4,4 @@ data/
 *.png
 *.npy
 
-signal.bin
+*.npz
