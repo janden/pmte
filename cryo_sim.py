@@ -22,9 +22,10 @@ def main():
     x1, x2 = np.meshgrid(g1d, g1d)
     r = np.hypot(x1, x2)
 
-    gen_fun = compat.oct_randn()
-
     psd_fun = lambda r: np.exp(-r ** 2 / (2 * width ** 2))
+
+    rng = np.random.default_rng(0)
+    gen_fun = rng.standard_normal
 
     x = simulation.generate_field((N, N), n,
             psd_fun=lambda x, y: psd_fun(np.hypot(x, y)),
@@ -32,7 +33,7 @@ def main():
 
     sig = util.load_new_sim_images(n)
 
-    x = (x + 43.5 / 4 * sig).astype(sig.dtype)
+    x = (x + 10 * sig).astype(sig.dtype)
 
     psd_true = psd_fun(np.fft.fftshift(r, axes=(-2, -1)))
 
@@ -91,7 +92,8 @@ def main():
         if do_print:
             print('%-20s%15e%15e%15e' % ('Masked periodogram', mse_mper, bias_mper, variance_mper))
 
-        x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W, gen_fun=gen_fun)
+        x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W, p=0, b=8,
+                use_sinc=True, gen_fun=gen_fun)
 
         mse_rt = mse(x_rt)
         bias_rt = bias(x_rt)
