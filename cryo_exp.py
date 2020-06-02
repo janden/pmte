@@ -16,6 +16,9 @@ def main():
 
     x, proj, groups = util.load_exp_images(n)
 
+    util.write_gplt_binary_matrix('data/cryo_exp_sig_noise1.bin', x[0])
+    util.write_gplt_binary_matrix('data/cryo_exp_sig_noise2.bin', x[1])
+
     N = x.shape[-1]
 
     g1d = np.arange(-N // 2, N // 2) / N
@@ -55,7 +58,7 @@ def main():
 
         mse_mper = mse(x_mper)
 
-        mses_mper.append(mses_mper)
+        mses_mper.append(mse_mper)
 
         if do_print:
             print('%-20s%15e' % ('Mask periodogram', mse_mper))
@@ -65,7 +68,7 @@ def main():
 
         mse_cmt = mse(x_cmt)
 
-        mses_cmt.append(mses_cmt)
+        mses_cmt.append(mse_cmt)
 
         if do_print:
             print('%-20s%15e' % ('Corner multitaper', mse_cmt))
