@@ -8,7 +8,7 @@ import util
 
 def main():
     N = 128
-    n = 1000
+    n = 500
 
     width = 0.125
 
@@ -30,7 +30,7 @@ def main():
             psd_fun=lambda x, y: psd_fun(np.hypot(x, y)),
             gen_fun=gen_fun)
 
-    sig = util.load_sim_images(n)
+    sig = util.load_new_sim_images(n)
 
     x = (x + 43.5 / 4 * sig).astype(sig.dtype)
 

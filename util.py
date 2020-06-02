@@ -5,6 +5,8 @@ import numpy as np
 
 from scipy.linalg import subspace_angles
 
+from scipy.ndimage import rotate
+
 def ensure_dir_exists(filename):
     dirname = os.path.dirname(filename)
     os.makedirs(dirname, exist_ok=True)
@@ -81,6 +83,30 @@ def load_sim_images(n=1000):
     im = im[:n]
 
     return im
+
+
+def load_new_sim_images(n=1000):
+    filename = 'signal.npz'
+
+    f = np.load(filename)
+
+    ims0 = f['ims']
+    ims0 = ims0.astype(np.float32)/ 255
+
+    n0 = ims0.shape[0]
+    sz0 = ims0.shape[-2:]
+
+    rng = np.random.default_rng(0)
+
+    idx = rng.choice(n0, n)
+    ims = ims0[idx]
+
+    angles = rng.uniform(0, 360, n)
+
+    for im, angle in zip(ims, angles):
+        rotate(im, angle, reshape=False, output=im)
+
+    return ims
 
 
 def load_exp_images(n=1024):
