@@ -102,3 +102,31 @@ def load_exp_images(n=1024):
     groups = groups[:n]
 
     return im, proj, groups
+
+
+def load_new_exp_images(n=120):
+    filename = 'exp.npz'
+
+    f = np.load(filename)
+
+    ims0 = f['ims']
+    projs0 = f['projs']
+
+    ims_range = f['ims_range']
+    projs_range = f['projs_range']
+
+    n0 = ims0.shape[0]
+
+    if n > n0:
+        raise RuntimeError('Number of images n must be smaller than %d.' % n0)
+
+    ims0 = ims0.astype(np.float32) / 255
+    projs0 = projs0.astype(np.float32) / 255
+
+    ims0 = ims0 * (ims_range[1] - ims_range[0]) + ims_range[0]
+    projs0 = projs0 * (projs_range[1] - projs_range[0]) + projs_range[0]
+
+    ims = ims0[:n]
+    projs = projs0[:n]
+
+    return ims, projs
