@@ -5,6 +5,7 @@ import oct2py
 
 import simulation
 import estimation
+import util
 
 
 def main():
@@ -68,7 +69,13 @@ def main():
 
         caro2.append(nmask)
 
-        print('%.15g %.15g' % (r * N, err2[-1]))
+    fname = 'data/mse2_single.csv'
+
+    util.ensure_dir_exists(fname)
+
+    with open(fname, 'w') as f:
+        for r, err in zip(rs, err2):
+            f.write('%.15g %.15g\n' % (r * N, err))
 
 
 if __name__ == '__main__':
