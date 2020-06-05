@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 import estimation
 import simulation
@@ -134,6 +135,30 @@ def main():
         for k in range(len(mask_rs)):
             f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), mses_mper[k],
                                        mses_cmt[k], mses_rt[k]))
+
+    min_mse_mper = np.min(mses_mper)
+    min_mse_cmt = np.min(mses_cmt)
+    min_mse_rt = np.min(mses_rt)
+
+    mse_factor_mper = min_mse_mper / min_mse_rt
+    mse_factor_cmt = min_mse_cmt / min_mse_rt
+
+    min_variance_mper = np.min(variances_mper)
+    min_variance_cmt = np.min(variances_cmt)
+    min_variance_rt = np.min(variances_rt)
+
+    variance_factor_mper = min_variance_mper / min_variance_rt
+    variance_factor_cmt = min_variance_cmt / min_variance_rt
+
+    results = {'min_mse_rt': float(min_mse_rt),
+               'mse_factor_mper': float(mse_factor_mper),
+               'mse_factor_cmt': float(mse_factor_cmt),
+               'variance_factor_mper': float(variance_factor_mper),
+               'variance_factor_cmt': float(variance_factor_cmt)}
+
+    with open('data/cryo_sim.json', 'w') as f:
+        json.dump(results, f)
+        f.write('\n')
 
 
 if __name__ == '__main__':
