@@ -25,7 +25,8 @@ def main():
     x1, x2 = np.meshgrid(g1d, g1d)
     r = np.hypot(x1, x2)
 
-    gen_fun = compat.oct_randn()
+    rng = np.random.default_rng(0)
+    gen_fun = rng.standard_normal
 
     psd_true = estimation.estimate_psd_multitaper(x - proj, 2, W=W)
 
@@ -42,7 +43,8 @@ def main():
     for mask_r in mask_rs:
         mask = (r >= mask_r)
 
-        x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W, gen_fun=gen_fun, p=0)
+        x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W,
+                gen_fun=gen_fun, p=0, b=8, use_sinc=True)
 
         mse_rt = mse(x_rt)
 
