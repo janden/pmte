@@ -2,6 +2,8 @@ import numpy as np
 
 from scipy.fft import fftn, ifftn
 from scipy.signal.windows import dpss
+from scipy.linalg import qr
+
 import pyfftw
 
 
@@ -205,11 +207,18 @@ def calc_corner_tapers(mask, W=1/8):
     return tapers
 
 
+def _orthogonalize(X):
+    Q, _ = qr(X.T, mode='economic', check_finite=False, overwrite_a=True)
+    return Q.T
+
+
 def calc_rand_tapers(mask, W=1/8, p=5, b=3, K=None, gen_fun=None,
                      use_sinc=False, use_fftw=False):
     if gen_fun is None:
         rng = np.random.default_rng()
         gen_fun = rng.standard_normal
+
+    qr_period = 16
 
     d = mask.ndim
 
@@ -226,15 +235,22 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, K=None, gen_fun=None,
     op = concentration_op(mask, W=W, use_sinc=use_sinc, use_fftw=use_fftw)
 
     X = gen_fun((K + p, sig_len))
-    if p == 0:
-        X = np.linalg.qr(X.T, 'reduced')[0].T
 
     # TODO: Shouldn't we do a QR here? Need to reduce the number of column
     # vectors in that case.
     for k in range(b):
+        if p == 0 and (k % qr_period == 0):
+            X = _orthogonalize(X)
+
+            if k > 0:
+                import util
+                dist = util.subspace_dist(X, X_prev)
+
+                print(f'{k=}, {dist=}')
+
+            X_prev = X.copy()
+
         X = op(X)
-        if p == 0:
-            X = np.linalg.qr(X.T, 'reduced')[0].T
 
     if p > 0:
         # Since the vectors are all row vectors, we need to consider the right
@@ -242,7 +258,7 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, K=None, gen_fun=None,
         _, S, V = np.linalg.svd(X, full_matrices=False)
         V = V[:K]
     else:
-        V = X
+        V = _orthogonalize(X)
 
     V = np.reshape(V, (K,) + sig_sz)
 
