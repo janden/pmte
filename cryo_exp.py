@@ -9,9 +9,9 @@ import estimation
 def main():
     n = 120
 
-    W = 1 / 128
+    W = 1 / 32
 
-    mask_rs = np.arange(36, 212 + 1, 8) / 360
+    mask_rs = np.arange(36, 172 + 1, 8) / 360
 
     do_print = True
 
