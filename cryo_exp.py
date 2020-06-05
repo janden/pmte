@@ -28,7 +28,8 @@ def main():
     rng = np.random.default_rng(0)
     gen_fun = rng.standard_normal
 
-    psd_true = estimation.estimate_psd_multitaper(x - proj, 2, W=W)
+    psd_true = estimation.estimate_psd_multitaper(x - proj, 2, W=W,
+            use_fftw=True)
 
     def mse(psd_est):
         return np.mean(np.abs(psd_est - psd_true) ** 2)
@@ -44,7 +45,7 @@ def main():
         mask = (r >= mask_r)
 
         x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W,
-                gen_fun=gen_fun, p=0, b=8, use_sinc=True)
+                gen_fun=gen_fun, p=0, b=8, use_sinc=True, use_fftw=True)
 
         mse_rt = mse(x_rt)
 
@@ -66,7 +67,7 @@ def main():
             print('%-20s%15e' % ('Mask periodogram', mse_mper))
 
         tapers = estimation.calc_corner_tapers(mask, W=W)
-        x_cmt = estimation.estimate_psd_tapers(x, tapers)
+        x_cmt = estimation.estimate_psd_tapers(x, tapers, use_fftw=True)
 
         mse_cmt = mse(x_cmt)
 
