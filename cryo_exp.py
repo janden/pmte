@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 import util
 import compat
@@ -81,6 +82,19 @@ def main():
             f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), mses_mper[k],
                                        mses_cmt[k], mses_rt[k]))
 
+    min_mse_mper = np.min(mses_mper)
+    min_mse_cmt = np.min(mses_cmt)
+    min_mse_rt = np.min(mses_rt)
+
+    factor_mper = min_mse_mper / min_mse_rt
+    factor_cmt = min_mse_cmt / min_mse_rt
+
+    results = {'factor_mper': float(factor_mper),
+               'factor_cmt': float(factor_cmt)}
+
+    with open('data/cryo_exp.json', 'w') as f:
+        json.dump(results, f)
+        f.write('\n')
 
 if __name__ == '__main__':
     main()
