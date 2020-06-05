@@ -274,8 +274,9 @@ def estimate_psd_periodogram(x, d):
     return x_per
 
 
-def estimate_psd_rand_tapers(x, mask, W=1/8, p=5, b=3, gen_fun=None):
-    h = calc_rand_tapers(mask, W=W, p=p, b=b, gen_fun=gen_fun, use_fftw=True)
+def estimate_psd_rand_tapers(x, mask, W=1/8, p=5, b=3, use_sinc=False, gen_fun=None):
+    h = calc_rand_tapers(mask, W=W, p=p, b=b, gen_fun=gen_fun,
+            use_sinc=use_sinc, use_fftw=True)
 
     x_rt = estimate_psd_tapers(x, h)
 
