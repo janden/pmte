@@ -156,3 +156,15 @@ def load_new_exp_images(n=120):
     projs = projs0[:n]
 
     return ims, projs
+
+
+def log_slope(x, y):
+    x = np.log(x)
+    y = np.log(y)
+
+    x = x - np.mean(x)
+    y = y - np.mean(y)
+
+    beta = np.dot(x, y) / np.dot(x, x)
+
+    return beta
