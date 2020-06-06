@@ -86,11 +86,12 @@ def main():
     min_mse_cmt = np.min(mses_cmt)
     min_mse_rt = np.min(mses_rt)
 
-    factor_mper = min_mse_mper / min_mse_rt
-    factor_cmt = min_mse_cmt / min_mse_rt
+    mse_factor_mper = min_mse_mper / min_mse_rt
+    mse_factor_cmt = min_mse_cmt / min_mse_rt
 
-    results = {'factor_mper': float(factor_mper),
-               'factor_cmt': float(factor_cmt)}
+    results = {'min_mse_rt': float(min_mse_rt),
+               'mse_factor_mper': float(mse_factor_mper),
+               'mse_factor_cmt': float(mse_factor_cmt)}
 
     with open('data/cryo_exp.json', 'w') as f:
         json.dump(results, f)
