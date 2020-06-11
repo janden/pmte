@@ -242,14 +242,6 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, K=None, gen_fun=None,
         if p == 0 and (k % qr_period == 0):
             X = _orthogonalize(X)
 
-            if k > 0:
-                import util
-                dist = util.subspace_dist(X, X_prev)
-
-                print(f'{k=}, {dist=}')
-
-            X_prev = X.copy()
-
         X = op(X)
 
     if p > 0:
