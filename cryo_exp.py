@@ -11,7 +11,7 @@ def main():
 
     W = 1 / 32
 
-    mask_rs = np.arange(36, 172 + 1, 8) / 360
+    mask_rs = np.arange(36, 144 + 1, 12) / 360
 
     do_print = True
 
