@@ -6,7 +6,7 @@ from estimation import calc_rand_tapers
 
 
 def main():
-    N = 256
+    N = 128
 
     Nf = 2 * N
 
