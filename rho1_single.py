@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 import util
 from estimation import calc_rand_tapers
@@ -48,7 +49,11 @@ def main():
 
     beta = util.log_slope(rs * N, err1)
 
-    print('Log error slope: %g' % beta)
+    results = {'beta': float(beta)}
+
+    with open('data/rho1_single.json', 'w') as f:
+        json.dump(results, f)
+        f.write('\n')
 
 
 if __name__ == '__main__':
