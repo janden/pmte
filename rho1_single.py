@@ -8,6 +8,8 @@ from estimation import calc_rand_tapers
 def main():
     N = 256
 
+    Nf = 2 * N
+
     W = 1/8
 
     X, Y = np.meshgrid(np.arange(-N / 2, N / 2), np.arange(-N / 2, N / 2))
@@ -15,8 +17,9 @@ def main():
 
     rs = 2 ** np.linspace(-4, -1, 3 * 4 + 1)
 
-    fX = np.fft.ifftshift(X) / N
-    fY = np.fft.ifftshift(Y) / N
+    fX, fY = np.meshgrid(np.arange(-Nf / 2, Nf / 2), np.arange(-Nf / 2, Nf / 2))
+    fX = np.fft.ifftshift(fX) / Nf
+    fY = np.fft.ifftshift(fY) / Nf
 
     err1 = []
 
@@ -29,7 +32,8 @@ def main():
         mask = R < (r * N)
         h = calc_rand_tapers(mask, W, gen_fun=gen_fun, use_fftw=True,
                 use_sinc=True, p=0, b=8)
-        rho = 1 / h.shape[0] * np.sum(np.abs(np.fft.fft2(h)) ** 2, axis=0)
+
+        rho = 1 / h.shape[0] * np.sum(np.abs(np.fft.fft2(h, (Nf,) * 2)) ** 2, axis=0)
 
         rho0 = np.zeros_like(rho)
         rho0[(np.abs(fX) < W) & (np.abs(fY) < W)] = 1 / (2 * W) ** 2
