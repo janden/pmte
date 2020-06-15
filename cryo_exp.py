@@ -86,10 +86,15 @@ def main():
     min_mse_cmt = np.min(mses_cmt)
     min_mse_rt = np.min(mses_rt)
 
+    argmin_mse_rt = 360 * mask_rs[np.argmin(mses_rt)]
+
     mse_factor_mper = min_mse_mper / min_mse_rt
     mse_factor_cmt = min_mse_cmt / min_mse_rt
 
-    results = {'min_mse_rt': float(min_mse_rt),
+    results = {'min_mse_mper': float(min_mse_mper),
+               'min_mse_cmt': float(min_mse_cmt),
+               'min_mse_rt': float(min_mse_rt),
+               'argmin_mse_rt': float(argmin_mse_rt),
                'mse_factor_mper': float(mse_factor_mper),
                'mse_factor_cmt': float(mse_factor_cmt)}
 
