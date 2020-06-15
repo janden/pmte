@@ -11,7 +11,7 @@ import util
 
 
 def main():
-    N = 256
+    N = 128
     n = 128
 
     X, Y = np.meshgrid(np.arange(-N / 2, N / 2), np.arange(-N / 2, N / 2))
