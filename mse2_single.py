@@ -1,4 +1,6 @@
 import numpy as np
+import json
+
 from scipy.special import jv
 
 import oct2py
@@ -42,17 +44,16 @@ def main():
 
         return val
 
-    oc = oct2py.Oct2Py()
-    oc.randn('state', 0)
-    gen_fun = lambda sz: np.transpose(oc.randn(*sz[::-1]))
+    rng = np.random.default_rng(0)
+    gen_fun = rng.standard_normal
 
     X = simulation.generate_field((N, N), n, psd_fun=_vectorized_psd_fun,
                                   gen_fun=gen_fun)
 
     rs = 2 ** np.linspace(-4, -1, 3 * 4 + 1)
 
-    err2 = []
-    caro2 = []
+    err2 = np.empty_like(rs)
+    caro2 = np.empty_like(rs)
 
     psd_true = _vectorized_psd_fun(fX, fY)
 
@@ -63,11 +64,13 @@ def main():
         W = 1 / 2 * nmask ** (-1 / 6)
 
         X_rt = estimation.estimate_psd_rand_tapers(X, mask, W=W,
-                                                   gen_fun=gen_fun)
+                                                   use_sinc=True, p=0, b=8,
+                                                   gen_fun=gen_fun,
+                                                   use_fftw=True)
 
-        err2.append(np.max(np.mean(np.abs(psd_true - X_rt) ** 2, axis=0)))
+        err2[k] = np.max(np.mean(np.abs(psd_true - X_rt) ** 2, axis=0))
 
-        caro2.append(nmask)
+        caro2[k] = nmask
 
     fname = 'data/mse2_single.csv'
 
@@ -76,6 +79,14 @@ def main():
     with open(fname, 'w') as f:
         for r, err in zip(rs, err2):
             f.write('%.15g %.15g\n' % (r * N, err))
+
+    beta = util.log_slope(rs * N, err2 / np.log(caro2) ** 2)
+
+    results = {'beta': float(beta)}
+
+    with open('data/mse2_single.json', 'w') as f:
+        json.dump(results, f)
+        f.write('\n')
 
 
 if __name__ == '__main__':
