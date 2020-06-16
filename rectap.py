@@ -39,7 +39,7 @@ def main():
 
     K = int(np.ceil(np.sqrt(np.sum(recmask2)) * 2 * W)) ** 2
 
-    rectapers = estimation.calc_rand_tapers(recmask2, W, p=0, b=72, K=K,
+    rectapers = estimation.calc_rand_tapers(recmask2, W, p=0, b=8, K=K,
                                             gen_fun=gen_fun, use_sinc=True,
                                             use_fftw=True)
 
@@ -114,9 +114,21 @@ def main():
     deviation = np.sqrt(np.sum(np.abs(tenmultiestim.ravel() - recmultiestim.ravel()) ** 2)
                         / np.sum(np.abs(tenmultiestim.ravel()) ** 2))
 
+    rectapers_conv = estimation.calc_rand_tapers(recmask2, W, p=0, b=72, K=K,
+                                                 gen_fun=gen_fun,
+                                                 use_sinc=True, use_fftw=True)
+
+    recmultiestim_conv = estimation.estimate_psd_tapers(signal, rectapers_conv)
+    recmultiestim_conv = np.fft.fftshift(recmultiestim_conv, axes=(-2, -1))
+
+    deviation_conv = \
+            np.sqrt(np.sum(np.abs(tenmultiestim - recmultiestim_conv) ** 2)
+                    / np.sum(np.abs(tenmultiestim) ** 2))
+
     results = {'recerror': float(recerror),
                'tenerror': float(tenerror),
-               'deviation': float(deviation)}
+               'deviation': float(deviation),
+               'deviation_conv': float(deviation_conv)}
 
     with open('data/rectap.json', 'w') as f:
         json.dump(results, f)
