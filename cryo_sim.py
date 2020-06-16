@@ -50,7 +50,7 @@ def main():
 
     corner_tapers = estimation.calc_corner_tapers(mask, W=W)
     corner_mask = np.any(np.abs(corner_tapers) > 0, axis=0)
-    util.write_gplt_binary_matrix('data/cryo_sim_mask_grid.bin', mask)
+    util.write_gplt_binary_matrix('data/cryo_sim_mask_grid.bin', corner_mask)
 
     def mse(psd_est):
         return np.mean(np.abs(psd_est - psd_true) ** 2)
