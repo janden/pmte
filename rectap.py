@@ -134,12 +134,6 @@ def main():
 
     print('deviation = %g' % deviation)
 
-    from scipy.linalg import subspace_angles
-    angles = subspace_angles(tentapers.reshape((-1, tentapers.shape[-1])),
-            rectapers.T.reshape((-1, rectapers.shape[0])))
-    print('operator norm error = %g' % np.sin(np.max(angles)))
-    print('trace norm error = %g' % np.mean(np.sin(angles)))
-
 
 if __name__ == '__main__':
     main()
