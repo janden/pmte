@@ -66,7 +66,7 @@ def main():
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, multiestim.T)
 
-    error = (np.sum(np.abs(density.ravel() - multiestim.ravel()) ** 2)
+    error = np.sqrt(np.sum(np.abs(density.ravel() - multiestim.ravel()) ** 2)
             / np.sum(np.abs(density.ravel()) ** 2))
 
     print(error)
