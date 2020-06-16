@@ -13,7 +13,7 @@ def main():
 
     g1d = np.arange(-N // 2, N // 2) / N
 
-    x1, x2 = np.meshgrid(g1d, g1d)
+    x1, x2 = np.meshgrid(g1d, g1d, indexing='ij')
     xi1, xi2 = x1, x2
 
     mask2 = np.hypot(xi1, xi2) >= R2

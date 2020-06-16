@@ -22,7 +22,7 @@ def main():
 
     g1d = np.arange(-N // 2, N // 2) / N
 
-    x1, x2 = np.meshgrid(g1d, g1d)
+    x1, x2 = np.meshgrid(g1d, g1d, indexing='ij')
     xi1, xi2 = x1, x2
 
     recmask2 = (-R2 <= xi1) & (xi1 < R2) & (-R2 <= xi2) & (xi2 < R2)
