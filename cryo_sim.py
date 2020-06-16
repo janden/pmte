@@ -8,13 +8,13 @@ import util
 
 def main():
     N = 128
-    n = 500
+    n = 1000
 
     width = 0.125
 
     W = 1 / 16
 
-    mask_rs = np.arange(28, 76 + 1, 4) / 128
+    mask_rs = np.arange(36, 72 + 1, 4) / 128
 
     do_print = True
 
