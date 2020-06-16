@@ -12,7 +12,7 @@ import util
 
 def main():
     N = 128
-    n = 128
+    n = 200
 
     X, Y = np.meshgrid(np.arange(-N / 2, N / 2), np.arange(-N / 2, N / 2))
     R = np.sqrt(X ** 2 + Y ** 2)
