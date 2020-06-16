@@ -9,13 +9,6 @@ import util
 import simulation
 
 
-def slepian_tapers(n, W):
-    V, E = dpss(n, n * W, Kmax=n, norm=2, return_ratios=True)
-    V = V.T
-
-    return V, E
-
-
 def main():
     N = 128
     R1 = 1 / 16
@@ -79,44 +72,36 @@ def main():
                        / np.sum(np.abs(density.ravel()) ** 2))
 
     N_tensor = int(np.floor(2 * R2 * N))
-    tapers, _ = slepian_tapers(N_tensor, R1)
 
-    K = int(np.round(2 * N_tensor * R1))
+    tapers = estimation.calc_tensor_tapers((N_tensor, N_tensor), W=W)
 
-    tapers = tapers[:, :K]
-
-    tapers = (tapers[:, np.newaxis, :, np.newaxis]
-              * tapers[np.newaxis, :, np.newaxis, :])
-
-    tapers = np.reshape(tapers, (N_tensor, N_tensor, -1))
-
-    tentapers = np.zeros((N, N, tapers.shape[2]))
+    tentapers = np.zeros((tapers.shape[0], N, N))
 
     mid = int(np.ceil((N + 1) / 2) - 1)
     ext1 = int(np.ceil((N_tensor - 1) / 2))
     ext2 = int(np.floor((N_tensor - 1) / 2) + 1)
 
-    tentapers[mid - ext1:mid + ext2, mid - ext1:mid + ext2, :] = tapers.real
+    tentapers[:, mid - ext1:mid + ext2, mid - ext1:mid + ext2] = tapers
 
-    teninten = estimation.taper_intensity(tentapers.T).T
+    teninten = estimation.taper_intensity(tentapers)
 
     fname = 'data/tentap1.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tentapers[:, :, 0].T)
+    util.write_gplt_binary_matrix(fname, tentapers[0, :, :])
 
     fname = 'data/tentap2.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tentapers[:, :, 1].T)
+    util.write_gplt_binary_matrix(fname, tentapers[1, :, :])
 
     fname = 'data/tentap17.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tentapers[:, :, 16].T)
+    util.write_gplt_binary_matrix(fname, tentapers[16, :, :])
 
     fname = 'data/teninten.bin'
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, teninten)
 
-    tenmultiestim = estimation.estimate_psd_tapers(signal, tentapers.T)
+    tenmultiestim = estimation.estimate_psd_tapers(signal, tentapers)
     tenmultiestim = np.fft.fftshift(tenmultiestim, axes=(-2, -1))
 
     fname = 'data/tenmt.bin'
