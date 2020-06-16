@@ -2,7 +2,6 @@ import numpy as np
 import json
 
 import util
-import compat
 import estimation
 
 

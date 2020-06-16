@@ -3,7 +3,6 @@ import json
 
 import estimation
 import simulation
-import compat
 import util
 
 

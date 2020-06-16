@@ -4,7 +4,6 @@ import json
 from scipy.signal.windows import dpss
 
 import estimation
-import compat
 import util
 import simulation
 
