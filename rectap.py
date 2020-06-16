@@ -42,19 +42,19 @@ def main():
 
     fname = 'data/rectap1.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, rectapers[0, :, :].T)
+    util.write_gplt_binary_matrix(fname, rectapers[0, :, :])
 
     fname = 'data/rectap2.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, rectapers[1, :, :].T)
+    util.write_gplt_binary_matrix(fname, rectapers[1, :, :])
 
     fname = 'data/rectap17.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, rectapers[16, :, :].T)
+    util.write_gplt_binary_matrix(fname, rectapers[16, :, :])
 
     fname = 'data/recinten.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, recinten.T)
+    util.write_gplt_binary_matrix(fname, recinten)
 
     density_fun = lambda xi1, xi2: \
         np.exp(-80 * (xi1 - 0.20) ** 2 - 40 * (xi2 - 0.25) ** 2) \
@@ -72,7 +72,7 @@ def main():
 
     fname = 'data/recmt.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, recmultiestim.T)
+    util.write_gplt_binary_matrix(fname, recmultiestim)
 
     recerror = np.sqrt(np.sum(np.abs(density.ravel() - recmultiestim.ravel()) ** 2)
                        / np.sum(np.abs(density.ravel()) ** 2))
@@ -103,15 +103,15 @@ def main():
 
     fname = 'data/tentap1.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tentapers[:, :, 0])
+    util.write_gplt_binary_matrix(fname, tentapers[:, :, 0].T)
 
     fname = 'data/tentap2.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tentapers[:, :, 1])
+    util.write_gplt_binary_matrix(fname, tentapers[:, :, 1].T)
 
     fname = 'data/tentap17.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tentapers[:, :, 16])
+    util.write_gplt_binary_matrix(fname, tentapers[:, :, 16].T)
 
     fname = 'data/teninten.bin'
     util.ensure_dir_exists(fname)
@@ -122,7 +122,7 @@ def main():
 
     fname = 'data/tenmt.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tenmultiestim.T)
+    util.write_gplt_binary_matrix(fname, tenmultiestim)
 
     tenerror = np.sqrt(np.sum(np.abs(density.ravel() - tenmultiestim.ravel()) ** 2)
                        / np.sum(np.abs(density.ravel()) ** 2))

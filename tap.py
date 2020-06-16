@@ -31,19 +31,19 @@ def main():
 
     fname = 'data/tap1.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tapers[0, :, :].T)
+    util.write_gplt_binary_matrix(fname, tapers[0, :, :])
 
     fname = 'data/tap2.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tapers[1, :, :].T)
+    util.write_gplt_binary_matrix(fname, tapers[1, :, :])
 
     fname = 'data/tap17.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tapers[16, :, :].T)
+    util.write_gplt_binary_matrix(fname, tapers[16, :, :])
 
     fname = 'data/inten.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, inten.T)
+    util.write_gplt_binary_matrix(fname, inten)
 
     density_fun = lambda xi1, xi2: \
         np.exp(-80 * (xi1 - 0.20) ** 2 - 40 * (xi2 - 0.25) ** 2) \
@@ -54,7 +54,7 @@ def main():
 
     fname = 'data/density.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, density.T)
+    util.write_gplt_binary_matrix(fname, density)
 
     signal = simulation.generate_field((N, N), 1, psd_fun=density_fun,
             gen_fun=gen_fun, real=False)
@@ -65,7 +65,7 @@ def main():
 
     fname = 'data/mt.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, multiestim.T)
+    util.write_gplt_binary_matrix(fname, multiestim)
 
     error = np.sqrt(np.sum(np.abs(density.ravel() - multiestim.ravel()) ** 2)
             / np.sum(np.abs(density.ravel()) ** 2))
