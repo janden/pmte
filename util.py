@@ -168,3 +168,22 @@ def log_slope(x, y):
     beta = np.dot(x, y) / np.dot(x, x)
 
     return beta
+
+
+def target_win(Nf, W, shifted=False):
+    g1d = np.arange(-Nf // 2, Nf // 2) / Nf
+
+    fX, fY = np.meshgrid(g1d, g1d, indexing='ij')
+
+    if not shifted:
+        fX = np.fft.ifftshift(fX)
+        fY = np.fft.ifftshift(fY)
+
+    rho = np.zeros((Nf, Nf))
+
+    rho[(np.abs(fX) < W) & (np.abs(fY) < W)] = 1 / (2 * W) ** 2
+    rho[(np.abs(fX) == W) & (np.abs(fY) < W)] = 1 / (2 * W) ** 2 / 2
+    rho[(np.abs(fX) < W) & (np.abs(fY) == W)] = 1 / (2 * W) ** 2 / 2
+    rho[(np.abs(fX) == W) & (np.abs(fY) == W)] = 1 / (2 * W) ** 2 / 4
+
+    return rho

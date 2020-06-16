@@ -13,7 +13,7 @@ def main():
     x1, x2 = np.meshgrid(g1d, g1d)
     xi1, xi2 = x1, x2
 
-    mask1 = (np.abs(x1) < R1) & (np.abs(x2) < R1)
+    mask1 = util.target_win(N, R1, shifted=True)
 
     fname = 'data/mask1.bin'
 

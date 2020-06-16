@@ -17,10 +17,6 @@ def main():
 
     rs = 2 ** np.linspace(-4, -1, 3 * 4 + 1)
 
-    fX, fY = np.meshgrid(np.arange(-Nf / 2, Nf / 2), np.arange(-Nf / 2, Nf / 2))
-    fX = np.fft.ifftshift(fX) / Nf
-    fY = np.fft.ifftshift(fY) / Nf
-
     err1 = []
 
     rng = np.random.default_rng(0)
@@ -35,11 +31,7 @@ def main():
 
         rho = 1 / h.shape[0] * np.sum(np.abs(np.fft.fft2(h, (Nf,) * 2)) ** 2, axis=0)
 
-        rho0 = np.zeros_like(rho)
-        rho0[(np.abs(fX) < W) & (np.abs(fY) < W)] = 1 / (2 * W) ** 2
-        rho0[(np.abs(fX) == W) & (np.abs(fY) < W)] = 1 / (2 * W) ** 2 / 2
-        rho0[(np.abs(fX) < W) & (np.abs(fY) == W)] = 1 / (2 * W) ** 2 / 2
-        rho0[(np.abs(fX) == W) & (np.abs(fY) == W)] = 1 / (2 * W) ** 2 / 4
+        rho0 = util.target_win(Nf, W)
 
         err1[k] = np.linalg.norm(rho.ravel() - rho0.ravel(), 1) / rho.size
 
