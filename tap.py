@@ -18,7 +18,8 @@ def main():
 
     mask2 = np.hypot(xi1, xi2) >= R2
 
-    gen_fun = compat.oct_randn()
+    rng = np.random.default_rng(0)
+    gen_fun = rng.standard_normal
 
     W = R1
 

@@ -27,7 +27,8 @@ def main():
 
     recmask2 = (-R2 <= xi1) & (xi1 < R2) & (-R2 <= xi2) & (xi2 < R2)
 
-    gen_fun = compat.oct_randn()
+    rng = np.random.default_rng(0)
+    gen_fun = rng.standard_normal
 
     W = R1
 
