@@ -31,6 +31,17 @@ def main():
     rng = np.random.default_rng(0)
     gen_fun = rng.standard_normal
 
+    density_fun = lambda xi1, xi2: \
+        np.exp(-80 * (xi1 - 0.20) ** 2 - 40 * (xi2 - 0.25) ** 2) \
+        + np.exp(-40 * (xi1 + 0.25) ** 2 - 80 * (xi2 + 0.25) ** 2) \
+        + 1.44 * np.exp(-80 * (xi1 - 0.10) ** 2 - 40 * (xi2 + 0.10) ** 2)
+
+    density = density_fun(xi1, xi2)
+
+    signal = simulation.generate_field((N, N), 1, psd_fun=density_fun,
+            gen_fun=gen_fun, real=False)
+    signal = signal[0]
+
     W = R1
 
     K = int(np.ceil(np.sqrt(np.sum(recmask2)) * 2 * W)) ** 2
@@ -56,17 +67,6 @@ def main():
     fname = 'data/recinten.bin'
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, recinten)
-
-    density_fun = lambda xi1, xi2: \
-        np.exp(-80 * (xi1 - 0.20) ** 2 - 40 * (xi2 - 0.25) ** 2) \
-        + np.exp(-40 * (xi1 + 0.25) ** 2 - 80 * (xi2 + 0.25) ** 2) \
-        + 1.44 * np.exp(-80 * (xi1 - 0.10) ** 2 - 40 * (xi2 + 0.10) ** 2)
-
-    density = density_fun(xi1, xi2)
-
-    signal = simulation.generate_field((N, N), 1, psd_fun=density_fun,
-            gen_fun=gen_fun, real=False)
-    signal = signal[0]
 
     recmultiestim = estimation.estimate_psd_tapers(signal, rectapers)
     recmultiestim = np.fft.fftshift(recmultiestim, axes=(-2, -1))
