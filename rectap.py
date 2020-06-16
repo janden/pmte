@@ -5,6 +5,7 @@ from scipy.signal.windows import dpss
 import estimation
 import compat
 import util
+import simulation
 
 
 def slepian_tapers(n, W):
@@ -54,18 +55,16 @@ def main():
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, recinten.T)
 
-    sqrtdensity = lambda xi1, xi2: \
-        np.exp(-40 * (xi1 - 0.20) ** 2 - 20 * (xi2 - 0.25) ** 2) \
-        + np.exp(-20 * (xi1 + 0.25) ** 2 - 40 * (xi2 + 0.25) ** 2) \
-        + 1.2 * np.exp(-40 * (xi1 - 0.10) ** 2 - 40 * (xi2 + 0.10) ** 2)
+    density_fun = lambda xi1, xi2: \
+        np.exp(-80 * (xi1 - 0.20) ** 2 - 40 * (xi2 - 0.25) ** 2) \
+        + np.exp(-40 * (xi1 + 0.25) ** 2 - 80 * (xi2 + 0.25) ** 2) \
+        + 1.44 * np.exp(-80 * (xi1 - 0.10) ** 2 - 40 * (xi2 + 0.10) ** 2)
 
-    # TODO: Make this work with simulation.generate_field.
-    sqrtdensity = sqrtdensity(xi2, xi1)
-    density = sqrtdensity ** 2
+    density = density_fun(xi1, xi2)
 
-    gen_fun = compat.oct_randn()
-    signal = gen_fun((N, N))
-    signal = util.centered_ifftn(sqrtdensity * util.centered_fftn(signal, 2), 2)
+    signal = simulation.generate_field((N, N), 1, psd_fun=density_fun,
+            gen_fun=gen_fun, real=False)
+    signal = signal[0]
 
     recmultiestim = estimation.estimate_psd_tapers(signal, rectapers)
     recmultiestim = np.fft.fftshift(recmultiestim, axes=(-2, -1))
