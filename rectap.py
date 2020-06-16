@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 from scipy.signal.windows import dpss
 
@@ -77,8 +78,6 @@ def main():
     recerror = np.sqrt(np.sum(np.abs(density.ravel() - recmultiestim.ravel()) ** 2)
                        / np.sum(np.abs(density.ravel()) ** 2))
 
-    print('recerror = %g' % recerror)
-
     N_tensor = int(np.floor(2 * R2 * N))
     tapers, _ = slepian_tapers(N_tensor, R1)
 
@@ -127,12 +126,16 @@ def main():
     tenerror = np.sqrt(np.sum(np.abs(density.ravel() - tenmultiestim.ravel()) ** 2)
                        / np.sum(np.abs(density.ravel()) ** 2))
 
-    print('tenerror = %g' % tenerror)
-
     deviation = np.sqrt(np.sum(np.abs(tenmultiestim.ravel() - recmultiestim.ravel()) ** 2)
                         / np.sum(np.abs(tenmultiestim.ravel()) ** 2))
 
-    print('deviation = %g' % deviation)
+    results = {'recerror': float(recerror),
+               'tenerror': float(tenerror),
+               'deviation': float(deviation)}
+
+    with open('data/rectap.json', 'w') as f:
+        json.dump(results, f)
+        f.write('\n')
 
 
 if __name__ == '__main__':

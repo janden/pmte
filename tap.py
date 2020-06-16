@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 import estimation
 import simulation
@@ -70,8 +71,11 @@ def main():
     error = np.sqrt(np.sum(np.abs(density.ravel() - multiestim.ravel()) ** 2)
             / np.sum(np.abs(density.ravel()) ** 2))
 
-    print(error)
+    results = {'error': float(error)}
 
+    with open('data/tap.json', 'w') as f:
+        json.dump(results, f)
+        f.write('\n')
 
 if __name__ == '__main__':
     main()
