@@ -7,7 +7,7 @@ from scipy.linalg import qr
 import pyfftw
 
 
-def concentration_op(mask, W=1/8, use_sinc=False, use_fftw=False):
+def concentration_op(mask, W=1/8, use_fftw=False):
     d = mask.ndim
 
     W = _ensure_W(W, d)
@@ -18,30 +18,19 @@ def concentration_op(mask, W=1/8, use_sinc=False, use_fftw=False):
     sig_sz = mask.shape
     sig_len = np.prod(sig_sz)
 
-    if not use_sinc:
-        rngs = [np.fft.fftfreq(sz) for sz in sig_sz]
-        grids = np.meshgrid(*rngs, indexing='ij')
+    two_sig_sz = tuple(2 * sz for sz in sig_sz)
 
-        freq_mask = np.full(sig_sz, True)
+    rngs = [sz * np.fft.fftfreq(sz) for sz in two_sig_sz]
+    grids = np.meshgrid(*rngs, indexing='ij')
 
-        for ell in range(d):
-            freq_mask &= np.abs(grids[ell]) < W[ell]
+    sinc_kernel = np.ones(two_sig_sz)
 
-        fft_sig_sz = sig_sz
-    else:
-        two_sig_sz = tuple(2 * sz for sz in sig_sz)
+    for ell in range(d):
+        sinc_kernel *= 2 * W[ell] * np.sinc(2 * W[ell] * grids[ell])
 
-        rngs = [sz * np.fft.fftfreq(sz) for sz in two_sig_sz]
-        grids = np.meshgrid(*rngs, indexing='ij')
+    freq_mask = fftn(sinc_kernel, axes=range(-d, 0), workers=-1)
 
-        sinc_kernel = np.ones(two_sig_sz)
-
-        for ell in range(d):
-            sinc_kernel *= 2 * W[ell] * np.sinc(2 * W[ell] * grids[ell])
-
-        freq_mask = fftn(sinc_kernel, axes=range(-d, 0), workers=-1)
-
-        fft_sig_sz = two_sig_sz
+    fft_sig_sz = two_sig_sz
 
     if use_fftw:
         in_array = pyfftw.empty_aligned((block_size,) + fft_sig_sz,
@@ -82,10 +71,9 @@ def concentration_op(mask, W=1/8, use_sinc=False, use_fftw=False):
             plan_backward()
             x = in_array
         else:
-            if use_sinc:
-                y = np.zeros(x.shape[:1] + two_sig_sz)
-                y[ixgrid] = x
-                x = y
+            y = np.zeros(x.shape[:1] + two_sig_sz)
+            y[ixgrid] = x
+            x = y
 
             xf = fftn(x, axes=range(-d, 0), workers=-1)
             xf = xf * freq_mask
@@ -213,7 +201,7 @@ def _orthogonalize(X):
 
 
 def calc_rand_tapers(mask, W=1/8, p=5, b=3, K=None, gen_fun=None,
-                     use_sinc=False, use_fftw=False):
+                     use_fftw=False):
     if gen_fun is None:
         rng = np.random.default_rng()
         gen_fun = rng.standard_normal
@@ -232,7 +220,7 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, K=None, gen_fun=None,
     if K is None:
         K = int(np.ceil(np.prod(2 * W) * np.sum(mask)))
 
-    op = concentration_op(mask, W=W, use_sinc=use_sinc, use_fftw=use_fftw)
+    op = concentration_op(mask, W=W, use_fftw=use_fftw)
 
     X = gen_fun((K + p, sig_len))
 
@@ -266,10 +254,10 @@ def estimate_psd_periodogram(x, d):
     return x_per
 
 
-def estimate_psd_rand_tapers(x, mask, W=1/8, p=5, b=3, use_sinc=False,
+def estimate_psd_rand_tapers(x, mask, W=1/8, p=5, b=3,
         use_fftw=False, gen_fun=None):
     h = calc_rand_tapers(mask, W=W, p=p, b=b, gen_fun=gen_fun,
-            use_sinc=use_sinc, use_fftw=use_fftw)
+            use_fftw=use_fftw)
 
     x_rt = estimate_psd_tapers(x, h, use_fftw=use_fftw)
 

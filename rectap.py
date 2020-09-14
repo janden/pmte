@@ -39,7 +39,7 @@ def main():
     K = int(np.ceil(np.sqrt(np.sum(recmask2)) * 2 * W)) ** 2
 
     rectapers = estimation.calc_rand_tapers(recmask2, W, p=0, b=8, K=K,
-                                            gen_fun=gen_fun, use_sinc=True,
+                                            gen_fun=gen_fun,
                                             use_fftw=True)
 
     recinten = estimation.taper_intensity(rectapers)
@@ -115,7 +115,7 @@ def main():
 
     rectapers_conv = estimation.calc_rand_tapers(recmask2, W, p=0, b=72, K=K,
                                                  gen_fun=gen_fun,
-                                                 use_sinc=True, use_fftw=True)
+                                                 use_fftw=True)
 
     recmultiestim_conv = estimation.estimate_psd_tapers(signal, rectapers_conv)
     recmultiestim_conv = np.fft.fftshift(recmultiestim_conv, axes=(-2, -1))

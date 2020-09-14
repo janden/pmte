@@ -63,7 +63,7 @@ def concentration_prob_1d(n, use_fft=False):
     V, E = slepian_tapers(n, W)
 
     if use_fft:
-        op_orig = concentration_op(np.full(n, True), W=W, use_sinc=True)
+        op_orig = concentration_op(np.full(n, True), W=W)
         op = lambda x: op_orig(x.T).T
     else:
         op = lambda x: V @ (E[:, np.newaxis] * (V.T @ x))
@@ -77,8 +77,7 @@ def concentration_prob_2d(n, use_fft=False):
     V, E = tensor_tapers(n, W)
 
     if use_fft:
-        op_orig = concentration_op(np.full((n,) * 2, True), W=W,
-                                   use_sinc=True)
+        op_orig = concentration_op(np.full((n,) * 2, True), W=W)
         op = lambda x: op_orig(x.T).T
     else:
         op = lambda x: V @ (E[:, np.newaxis] * (V.T @ x))
