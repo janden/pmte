@@ -170,10 +170,22 @@ def log_slope(x, y):
     return beta
 
 
-def target_win(Nf, W, shifted=False):
-    g1d = np.arange(-Nf // 2, Nf // 2) / Nf
+def grid(sz):
+    sz = np.array(sz)
 
-    fX, fY = np.meshgrid(g1d, g1d, indexing='ij')
+    if sz.ndim == 0:
+        sz = sz[np.newaxis]
+
+    rngs = [np.ceil(np.arange(-N / 2, N / 2)) for N in sz]
+
+    grid = np.meshgrid(*rngs, indexing='ij')
+
+    return grid
+
+
+def target_win(Nf, W, shifted=False):
+    fX, fY = grid((Nf, Nf))
+    fX, fY = fX / Nf, fY / Nf
 
     if not shifted:
         fX = np.fft.ifftshift(fX)
@@ -189,3 +201,21 @@ def target_win(Nf, W, shifted=False):
     rho[(np.abs(fX) == half_W) & (np.abs(fY) == half_W)] = 1 / W ** 2 / 4
 
     return rho
+
+
+def disk_mask(N, R):
+    x1, x2 = grid((N, N))
+
+    r = np.hypot(x1, x2)
+
+    mask = (r >= R)
+
+    return mask
+
+
+def square_mask(N, R):
+    x1, x2 = grid((N, N))
+
+    mask = (-R <= x1) & (x1 < R) & (-R <= x2) & (x2 < R)
+
+    return mask
