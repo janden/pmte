@@ -1,5 +1,6 @@
 import numpy as np
 
+from estimation import concentration_op
 import util
 
 
@@ -7,16 +8,14 @@ def main():
     N = 32
     W = 7 / 32
 
-    g1d = np.fft.fftfreq(N)
-    g1dp = np.fft.fftfreq(2 * N)
+    mask = np.full((N,), True)
+    op = concentration_op(mask, W=0.5*W)
 
-    A = W * np.sinc(W * N * (g1d[np.newaxis, :] - g1d[:, np.newaxis]))
+    A = op(np.eye(N))
 
-    D, _ = np.linalg.eig(A)
+    D = np.linalg.eigvalsh(A)
 
-    D = np.real(D)
-
-    D = np.sort(D)[::-1]
+    D = D[::-1]
 
     fname = 'data/spectrum.csv'
 
