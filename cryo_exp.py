@@ -8,7 +8,7 @@ import estimation
 def main():
     n = 120
 
-    W = 1 / 32
+    W = 1 / 16
 
     mask_rs = np.arange(36, 144 + 1, 12) / 360
 

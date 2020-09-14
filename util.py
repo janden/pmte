@@ -181,9 +181,11 @@ def target_win(Nf, W, shifted=False):
 
     rho = np.zeros((Nf, Nf))
 
-    rho[(np.abs(fX) < W) & (np.abs(fY) < W)] = 1 / (2 * W) ** 2
-    rho[(np.abs(fX) == W) & (np.abs(fY) < W)] = 1 / (2 * W) ** 2 / 2
-    rho[(np.abs(fX) < W) & (np.abs(fY) == W)] = 1 / (2 * W) ** 2 / 2
-    rho[(np.abs(fX) == W) & (np.abs(fY) == W)] = 1 / (2 * W) ** 2 / 4
+    half_W = W / 2
+
+    rho[(np.abs(fX) < half_W) & (np.abs(fY) < half_W)] = 1 / W ** 2
+    rho[(np.abs(fX) == half_W) & (np.abs(fY) < half_W)] = 1 / W ** 2 / 2
+    rho[(np.abs(fX) < half_W) & (np.abs(fY) == half_W)] = 1 / W ** 2 / 2
+    rho[(np.abs(fX) == half_W) & (np.abs(fY) == half_W)] = 1 / W ** 2 / 4
 
     return rho

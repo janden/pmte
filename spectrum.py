@@ -9,7 +9,7 @@ def main():
     W = 7 / 32
 
     mask = np.full((N,), True)
-    op = concentration_op(mask, W=0.5*W)
+    op = concentration_op(mask, W=W)
 
     A = op(np.eye(N))
 

@@ -8,7 +8,7 @@ import util
 
 def main():
     N = 128
-    R1 = 1 / 16
+    R1 = 1 / 8
     R2 = 1 / 3
 
     g1d = np.arange(-N // 2, N // 2) / N

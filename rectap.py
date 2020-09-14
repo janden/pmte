@@ -10,7 +10,7 @@ import simulation
 
 def main():
     N = 128
-    R1 = 1 / 16
+    R1 = 1 / 8
     R2 = 1 / 3
 
     g1d = np.arange(-N // 2, N // 2) / N
@@ -36,7 +36,7 @@ def main():
 
     W = R1
 
-    K = int(np.ceil(np.sqrt(np.sum(recmask2)) * 2 * W)) ** 2
+    K = int(np.ceil(np.sqrt(np.sum(recmask2)) * W)) ** 2
 
     rectapers = estimation.calc_rand_tapers(recmask2, W, b=8, K=K,
                                             gen_fun=gen_fun,

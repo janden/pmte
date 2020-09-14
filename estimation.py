@@ -7,7 +7,7 @@ from scipy.linalg import qr
 import pyfftw
 
 
-def concentration_op(mask, W=1/8, use_fftw=False):
+def concentration_op(mask, W=1 / 4, use_fftw=False):
     d = mask.ndim
 
     W = _ensure_W(W, d)
@@ -26,7 +26,7 @@ def concentration_op(mask, W=1/8, use_fftw=False):
     sinc_kernel = np.ones(two_sig_sz)
 
     for ell in range(d):
-        sinc_kernel *= 2 * W[ell] * np.sinc(2 * W[ell] * grids[ell])
+        sinc_kernel *= W[ell] * np.sinc(W[ell] * grids[ell])
 
     freq_mask = fftn(sinc_kernel, axes=range(-d, 0), workers=-1)
 
@@ -120,7 +120,7 @@ def concentration_op(mask, W=1/8, use_fftw=False):
     return _reshaped_apply
 
 
-def calc_tensor_tapers(sig_shape, W=1/8):
+def calc_tensor_tapers(sig_shape, W=1 / 4):
     if not isinstance(sig_shape, tuple):
         sig_shape = (sig_shape, )
 
@@ -130,11 +130,11 @@ def calc_tensor_tapers(sig_shape, W=1/8):
 
     h = np.ones((1,) * (2 * d), dtype=np.float64)
 
-    K = np.round(2 * np.array(sig_shape) * W).astype('int')
+    K = np.round(np.array(sig_shape) * W).astype('int')
 
     for ell in range(d):
         if K[ell] > 0:
-            h_ell = dpss(sig_shape[ell], sig_shape[ell] * W[ell],
+            h_ell = dpss(sig_shape[ell], sig_shape[ell] * W[ell] / 2,
                          Kmax=K[ell], norm=2)
         else:
             # If K is too small, just use constant taper (so we get the
@@ -159,7 +159,7 @@ def calc_tensor_tapers(sig_shape, W=1/8):
     return h
 
 
-def calc_corner_tapers(mask, W=1/8):
+def calc_corner_tapers(mask, W=1 / 4):
     d = mask.ndim
 
     if not d == 2:
@@ -200,7 +200,7 @@ def _orthogonalize(X):
     return Q.T
 
 
-def calc_rand_tapers(mask, W=1/8, b=3, K=None, gen_fun=None,
+def calc_rand_tapers(mask, W=1 / 4, b=3, K=None, gen_fun=None,
                      use_fftw=False):
     if gen_fun is None:
         rng = np.random.default_rng()
@@ -210,15 +210,13 @@ def calc_rand_tapers(mask, W=1/8, b=3, K=None, gen_fun=None,
 
     d = mask.ndim
 
-    # TODO: This W does not correspond to the W used in the paper, since this
-    # is the half-bandwidth. To get the W in the paper, multiply by 2.
     W = _ensure_W(W, d)
 
     sig_sz = mask.shape
     sig_len = np.prod(sig_sz)
 
     if K is None:
-        K = int(np.ceil(np.prod(2 * W) * np.sum(mask)))
+        K = int(np.ceil(np.prod(W) * np.sum(mask)))
 
     op = concentration_op(mask, W=W, use_fftw=use_fftw)
 
@@ -246,7 +244,7 @@ def estimate_psd_periodogram(x, d):
     return x_per
 
 
-def estimate_psd_rand_tapers(x, mask, W=1/8, b=3,
+def estimate_psd_rand_tapers(x, mask, W=1 / 4, b=3,
         use_fftw=False, gen_fun=None):
     h = calc_rand_tapers(mask, W=W, b=b, gen_fun=gen_fun,
             use_fftw=use_fftw)
@@ -255,7 +253,7 @@ def estimate_psd_rand_tapers(x, mask, W=1/8, b=3,
 
     return x_rt
 
-def estimate_psd_multitaper(x, d, W=1/8, use_fftw=False):
+def estimate_psd_multitaper(x, d, W=1 / 4, use_fftw=False):
     shape = x.shape[-d:]
 
     h = calc_tensor_tapers(shape, W=W)
@@ -364,8 +362,8 @@ def _ensure_W(W, d):
     elif W.shape[0] != d:
         raise TypeError('Bandwidth W must have 1 or d elements.')
 
-    if any(W >= 0.5):
-        raise ValueError('Bandwidth W must be strictly smaller than 0.5.')
+    if any(W >= 1):
+        raise ValueError('Bandwidth W must be strictly smaller than 1.')
 
     return W
 

@@ -12,7 +12,7 @@ def main():
 
     width = 0.125
 
-    W = 1 / 16
+    W = 1 / 8
 
     mask_rs = np.arange(36, 72 + 1, 4) / 128
 

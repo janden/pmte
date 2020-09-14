@@ -10,7 +10,7 @@ def main():
 
     Nf = 2 * N
 
-    W = 1/8
+    W = 1 / 4
 
     X, Y = np.meshgrid(np.arange(-N / 2, N / 2), np.arange(-N / 2, N / 2))
     R = np.sqrt(X ** 2 + Y ** 2)

@@ -11,7 +11,7 @@ import util
 def main():
     N = 128
 
-    W = 1 / 8
+    W = 1 / 4
 
     n_eigs = 256
 
