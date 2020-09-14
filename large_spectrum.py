@@ -32,7 +32,7 @@ def main():
     op = concentration_op(mask, W=W, use_fftw=True)
 
     if compare_ref:
-        h = calc_rand_tapers(mask, W=W, p=0, b=32)
+        h = calc_rand_tapers(mask, W=W, b=32)
 
         # Need this to be a standard 2D matrix.
         h = np.reshape(h, (h.shape[0], -1))

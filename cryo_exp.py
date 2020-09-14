@@ -45,7 +45,7 @@ def main():
         mask = (r >= mask_r)
 
         x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W,
-                gen_fun=gen_fun, p=0, b=8, use_fftw=True)
+                gen_fun=gen_fun, b=8, use_fftw=True)
 
         mse_rt = mse(x_rt)
 

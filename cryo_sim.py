@@ -92,7 +92,7 @@ def main():
         if do_print:
             print('%-20s%15e%15e%15e' % ('Masked periodogram', mse_mper, bias_mper, variance_mper))
 
-        x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W, p=0, b=8,
+        x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W, b=8,
                 use_fftw=True, gen_fun=gen_fun)
 
         mse_rt = mse(x_rt)

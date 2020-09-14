@@ -200,7 +200,7 @@ def _orthogonalize(X):
     return Q.T
 
 
-def calc_rand_tapers(mask, W=1/8, p=5, b=3, K=None, gen_fun=None,
+def calc_rand_tapers(mask, W=1/8, b=3, K=None, gen_fun=None,
                      use_fftw=False):
     if gen_fun is None:
         rng = np.random.default_rng()
@@ -222,23 +222,15 @@ def calc_rand_tapers(mask, W=1/8, p=5, b=3, K=None, gen_fun=None,
 
     op = concentration_op(mask, W=W, use_fftw=use_fftw)
 
-    X = gen_fun((K + p, sig_len))
+    X = gen_fun((K, sig_len))
 
-    # TODO: Shouldn't we do a QR here? Need to reduce the number of column
-    # vectors in that case.
     for k in range(b):
-        if p == 0 and (k % qr_period == 0):
+        if k % qr_period == 0:
             X = _orthogonalize(X)
 
         X = op(X)
 
-    if p > 0:
-        # Since the vectors are all row vectors, we need to consider the right
-        # singular vectors.
-        _, S, V = np.linalg.svd(X, full_matrices=False)
-        V = V[:K]
-    else:
-        V = _orthogonalize(X)
+    V = _orthogonalize(X)
 
     V = np.reshape(V, (K,) + sig_sz)
 
@@ -254,9 +246,9 @@ def estimate_psd_periodogram(x, d):
     return x_per
 
 
-def estimate_psd_rand_tapers(x, mask, W=1/8, p=5, b=3,
+def estimate_psd_rand_tapers(x, mask, W=1/8, b=3,
         use_fftw=False, gen_fun=None):
-    h = calc_rand_tapers(mask, W=W, p=p, b=b, gen_fun=gen_fun,
+    h = calc_rand_tapers(mask, W=W, b=b, gen_fun=gen_fun,
             use_fftw=use_fftw)
 
     x_rt = estimate_psd_tapers(x, h, use_fftw=use_fftw)

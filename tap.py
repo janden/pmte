@@ -38,7 +38,7 @@ def main():
 
     W = R1
 
-    tapers = estimation.calc_rand_tapers(mask2, W, p=0, b=8,
+    tapers = estimation.calc_rand_tapers(mask2, W, b=8,
                                          gen_fun=gen_fun,
                                          use_fftw=True)
 

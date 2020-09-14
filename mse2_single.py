@@ -64,7 +64,7 @@ def main():
         W = 1 / 2 * nmask ** (-1 / 6)
 
         X_rt = estimation.estimate_psd_rand_tapers(X, mask, W=W,
-                                                   p=0, b=8,
+                                                   b=8,
                                                    gen_fun=gen_fun,
                                                    use_fftw=True)
 
