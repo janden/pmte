@@ -208,7 +208,7 @@ def disk_mask(N, R):
 
     r = np.hypot(x1, x2)
 
-    mask = (r >= R)
+    mask = (r < R)
 
     return mask
 

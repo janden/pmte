@@ -15,7 +15,7 @@ def main():
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, mask1)
 
-    mask2 = util.disk_mask(N, R)
+    mask2 = ~util.disk_mask(N, R)
 
     fname = 'data/mask2.bin'
 

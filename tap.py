@@ -11,7 +11,7 @@ def main():
     W = 1 / 8
     R2 = 1 / 3
 
-    mask2 = util.disk_mask(N, N * R2)
+    mask2 = ~util.disk_mask(N, N * R2)
 
     rng = np.random.default_rng(0)
     gen_fun = rng.standard_normal
