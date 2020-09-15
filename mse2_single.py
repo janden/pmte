@@ -14,12 +14,6 @@ def main():
     N = 128
     n = 200
 
-    X, Y = np.meshgrid(np.arange(-N / 2, N / 2), np.arange(-N / 2, N / 2))
-    R = np.sqrt(X ** 2 + Y ** 2)
-
-    fX = np.fft.ifftshift(X) / N
-    fY = np.fft.ifftshift(Y) / N
-
     # TODO: These weights do not seem to correspond exactly to those of lgwt.
     omegan, omegaw = np.polynomial.legendre.leggauss(200)
     omegan = (omegan + 1) / 2 * 100
@@ -55,10 +49,12 @@ def main():
     err2 = np.empty_like(rs)
     caro2 = np.empty_like(rs)
 
-    psd_true = _vectorized_psd_fun(fX, fY)
+    xi1, xi2 = util.grid((N, N))
+    psd_true = _vectorized_psd_fun(xi1 / N, xi2 / N)
+    psd_true = np.fft.ifftshift(psd_true, axes=(-2, -1))
 
     for k, r in enumerate(rs):
-        mask = R < (r * N)
+        mask = util.disk_mask(N, r * N)
         nmask = np.sum(mask)
 
         W = nmask ** (-1 / 6)

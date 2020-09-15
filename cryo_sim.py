@@ -18,24 +18,21 @@ def main():
 
     do_print = True
 
-    g1d = np.arange(-N // 2, N // 2) / N
-    x1, x2 = np.meshgrid(g1d, g1d)
-    r = np.hypot(x1, x2)
-
-    psd_fun = lambda r: np.exp(-r ** 2 / (2 * width ** 2))
+    psd_fun = lambda x, y: np.exp(-np.hypot(x, y) ** 2 / (2 * width ** 2))
 
     rng = np.random.default_rng(0)
     gen_fun = rng.standard_normal
 
     x = simulation.generate_field((N, N), n,
-            psd_fun=lambda x, y: psd_fun(np.hypot(x, y)),
-            gen_fun=gen_fun)
+            psd_fun=psd_fun, gen_fun=gen_fun)
 
     sig = util.load_new_sim_images(n)
 
     x = (x + 10 * sig).astype(sig.dtype)
 
-    psd_true = psd_fun(np.fft.fftshift(r, axes=(-2, -1)))
+    xi1, xi2 = util.grid((N, N))
+    psd_true = psd_fun(xi1 / N, xi2 / N)
+    psd_true = np.fft.fftshift(psd_true, axes=(-2, -1))
 
     util.write_gplt_binary_matrix('data/cryo_sim_sig1.bin', sig[0])
     util.write_gplt_binary_matrix('data/cryo_sim_sig2.bin', sig[1])
@@ -45,7 +42,7 @@ def main():
                                   np.fft.ifftshift(psd_true, axes=(-2, -1)))
 
     mask_r = 60 / 128
-    mask = (r >= mask_r)
+    mask = ~util.disk_mask(N, mask_r * N)
     util.write_gplt_binary_matrix('data/cryo_sim_mask.bin', mask)
 
     corner_tapers = estimation.calc_corner_tapers(mask, W=W)
@@ -74,7 +71,7 @@ def main():
     biases_rt = []
 
     for mask_r in mask_rs:
-        mask = (r >= mask_r)
+        mask = ~util.disk_mask(N, mask_r * N)
 
         xm = x * mask
 

@@ -21,10 +21,6 @@ def main():
 
     N = x.shape[-1]
 
-    g1d = np.arange(-N // 2, N // 2) / N
-    x1, x2 = np.meshgrid(g1d, g1d)
-    r = np.hypot(x1, x2)
-
     rng = np.random.default_rng(0)
     gen_fun = rng.standard_normal
 
@@ -42,7 +38,7 @@ def main():
     mses_cmt = []
 
     for mask_r in mask_rs:
-        mask = (r >= mask_r)
+        mask = ~util.disk_mask(N, mask_r * N)
 
         x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W,
                 gen_fun=gen_fun, b=8, use_fftw=True)

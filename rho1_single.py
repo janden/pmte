@@ -12,9 +12,6 @@ def main():
 
     W = 1 / 4
 
-    X, Y = np.meshgrid(np.arange(-N / 2, N / 2), np.arange(-N / 2, N / 2))
-    R = np.sqrt(X ** 2 + Y ** 2)
-
     rs = 2 ** np.linspace(-4, -1, 3 * 4 + 1)
 
     err1 = []
@@ -25,7 +22,7 @@ def main():
     err1 = np.empty_like(rs)
 
     for k, r in enumerate(rs):
-        mask = R < (r * N)
+        mask = util.disk_mask(N, r * N)
         h = calc_rand_tapers(mask, W, gen_fun=gen_fun, use_fftw=True,
                 b=8)
 
