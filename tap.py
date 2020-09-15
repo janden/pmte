@@ -8,15 +8,10 @@ import util
 
 def main():
     N = 128
-    R1 = 1 / 8
+    W = 1 / 8
     R2 = 1 / 3
 
-    g1d = np.arange(-N // 2, N // 2) / N
-
-    x1, x2 = np.meshgrid(g1d, g1d, indexing='ij')
-    xi1, xi2 = x1, x2
-
-    mask2 = np.hypot(xi1, xi2) >= R2
+    mask2 = util.disk_mask(N, N * R2)
 
     rng = np.random.default_rng(0)
     gen_fun = rng.standard_normal
@@ -26,7 +21,8 @@ def main():
         + np.exp(-40 * (xi1 + 0.25) ** 2 - 80 * (xi2 + 0.25) ** 2) \
         + 1.44 * np.exp(-80 * (xi1 - 0.10) ** 2 - 40 * (xi2 + 0.10) ** 2)
 
-    density = density_fun(xi1, xi2)
+    xi1, xi2 = util.grid((N, N))
+    density = density_fun(xi1 / N, xi2 / N)
 
     fname = 'data/density.bin'
     util.ensure_dir_exists(fname)
@@ -35,8 +31,6 @@ def main():
     signal = simulation.generate_field((N, N), 1, psd_fun=density_fun,
             gen_fun=gen_fun, real=False)
     signal = signal[0]
-
-    W = R1
 
     tapers = estimation.calc_rand_tapers(mask2, W, b=8,
                                          gen_fun=gen_fun,
