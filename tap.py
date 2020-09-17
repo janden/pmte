@@ -21,8 +21,8 @@ def main():
         + np.exp(-40 * (xi1 + 0.25) ** 2 - 80 * (xi2 + 0.25) ** 2) \
         + 1.44 * np.exp(-80 * (xi1 - 0.10) ** 2 - 40 * (xi2 + 0.10) ** 2)
 
-    xi1, xi2 = util.grid((N, N))
-    density = density_fun(xi1 / N, xi2 / N)
+    xi1, xi2 = util.grid((N, N), normalized=True)
+    density = density_fun(xi1, xi2)
 
     fname = 'data/density.bin'
     util.ensure_dir_exists(fname)

@@ -47,9 +47,8 @@ def main():
     err2 = np.empty_like(rs)
     caro2 = np.empty_like(rs)
 
-    xi1, xi2 = util.grid((N, N))
-    psd_true = _vectorized_psd_fun(xi1 / N, xi2 / N)
-    psd_true = np.fft.ifftshift(psd_true, axes=(-2, -1))
+    xi1, xi2 = util.grid((N, N), normalized=True, shifted=False)
+    psd_true = _vectorized_psd_fun(xi1, xi2)
 
     for k, r in enumerate(rs):
         mask = util.disk_mask(N, r * N)
