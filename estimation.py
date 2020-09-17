@@ -21,7 +21,7 @@ def _try_import_pyfftw():
     return pyfftw, use_fftw
 
 
-def concentration_op(mask, W=1 / 4, use_fftw=False):
+def concentration_op(mask, W=1 / 4, use_fftw=True):
     if use_fftw:
         pyfftw, use_fftw = _try_import_pyfftw()
 
@@ -218,7 +218,7 @@ def _orthogonalize(X):
 
 
 def calc_rand_tapers(mask, W=1 / 4, n_iter=8, K=None, rng=None,
-                     use_fftw=False):
+                     use_fftw=True):
     if rng is None:
         rng = np.random.default_rng()
 
@@ -261,7 +261,7 @@ def estimate_psd_periodogram(x, d):
 
 
 def estimate_psd_rand_tapers(x, mask, W=1 / 4, n_iter=8,
-        use_fftw=False, rng=None):
+        use_fftw=True, rng=None):
     h = calc_rand_tapers(mask, W=W, n_iter=n_iter, rng=rng,
             use_fftw=use_fftw)
 
@@ -269,7 +269,7 @@ def estimate_psd_rand_tapers(x, mask, W=1 / 4, n_iter=8,
 
     return x_rt
 
-def estimate_psd_multitaper(x, d, W=1 / 4, use_fftw=False):
+def estimate_psd_multitaper(x, d, W=1 / 4, use_fftw=True):
     shape = x.shape[-d:]
 
     h = calc_tensor_tapers(shape, W=W)
@@ -279,7 +279,7 @@ def estimate_psd_multitaper(x, d, W=1 / 4, use_fftw=False):
     return x_mt
 
 
-def estimate_psd_tapers(x, tapers, use_fftw=False):
+def estimate_psd_tapers(x, tapers, use_fftw=True):
     if use_fftw:
         pyfftw, use_fftw = _try_import_pyfftw()
 

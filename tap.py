@@ -31,8 +31,7 @@ def main():
             rng=rng, real=False)
     signal = signal[0]
 
-    tapers = estimation.calc_rand_tapers(mask2, W, rng=rng,
-                                         use_fftw=True)
+    tapers = estimation.calc_rand_tapers(mask2, W, rng=rng)
 
     inten = estimation.taper_intensity(tapers)
 

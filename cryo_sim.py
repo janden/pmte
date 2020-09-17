@@ -87,8 +87,7 @@ def main():
         if do_print:
             print('%-20s%15e%15e%15e' % ('Masked periodogram', mse_mper, bias_mper, variance_mper))
 
-        x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W,
-                use_fftw=True, rng=rng)
+        x_rt = estimation.estimate_psd_rand_tapers(x, mask, W, rng=rng)
 
         mse_rt = mse(x_rt)
         bias_rt = bias(x_rt)
@@ -102,7 +101,7 @@ def main():
             print('%-20s%15e%15e%15e' % ('Randomtaper', mse_rt, bias_rt, variance_rt))
 
         tapers = estimation.calc_corner_tapers(mask, W=W)
-        x_cmt = estimation.estimate_psd_tapers(x, tapers, use_fftw=True)
+        x_cmt = estimation.estimate_psd_tapers(x, tapers)
 
         mse_cmt = mse(x_cmt)
         bias_cmt = bias(x_cmt)

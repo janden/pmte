@@ -29,7 +29,7 @@ def main():
 
     compare_ref = False
 
-    op = concentration_op(mask, W=W, use_fftw=True)
+    op = concentration_op(mask, W)
 
     if compare_ref:
         h = calc_rand_tapers(mask, W=W, n_iter=32)

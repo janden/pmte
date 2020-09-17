@@ -45,9 +45,7 @@ def main():
 
         W = nmask ** (-1 / 6)
 
-        X_rt = estimation.estimate_psd_rand_tapers(X, mask, W=W,
-                                                   rng=rng,
-                                                   use_fftw=True)
+        X_rt = estimation.estimate_psd_rand_tapers(X, mask, W, rng=rng)
 
         err2[k] = np.max(np.mean(np.abs(psd_true - X_rt) ** 2, axis=0))
 
