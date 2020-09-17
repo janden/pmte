@@ -33,13 +33,13 @@ def main():
 
     rs = 2 ** np.linspace(-4, -1, 3 * 4 + 1)
 
-    err2 = np.empty_like(rs)
-    caro2 = np.empty_like(rs)
+    err2 = []
+    caro2 = []
 
     xi1, xi2 = util.grid((N, N))
     psd_true = psd_fun(xi1, xi2)
 
-    for k, r in enumerate(rs):
+    for r in rs:
         mask = util.disk_mask(N, r * N)
         nmask = np.sum(mask)
 
@@ -47,9 +47,12 @@ def main():
 
         X_rt = estimation.estimate_psd_rand_tapers(X, mask, W, rng=rng)
 
-        err2[k] = np.max(np.mean(np.abs(psd_true - X_rt) ** 2, axis=0))
+        err2.append(np.max(np.mean(np.abs(psd_true - X_rt) ** 2, axis=0)))
 
-        caro2[k] = nmask
+        caro2.append(nmask)
+
+    err2 = np.array(err2)
+    caro2 = np.array(caro2)
 
     fname = 'data/mse2_single.csv'
 
