@@ -357,11 +357,13 @@ def estimate_psd_tapers(x, tapers, use_fftw=True):
 
     return x_mt
 
-def taper_intensity(tapers):
+def taper_intensity(tapers, grid_sz=None):
     d = tapers.ndim - 1
 
-    tapers = np.fft.ifftshift(tapers, axes=range(-d, 0))
-    tapers_f = fftn(tapers, axes=range(-d, 0), workers=-1)
+    if grid_sz is None:
+        grid_sz = tapers.shape[-d:]
+
+    tapers_f = fftn(tapers, grid_sz, axes=range(-d, 0), workers=-1)
     tapers_f = np.fft.fftshift(tapers_f, axes=range(-d, 0))
 
     inten = np.sum(np.abs(tapers_f) ** 2, axis=0)
