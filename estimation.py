@@ -1,8 +1,7 @@
 import numpy as np
 
-from scipy.fft import fftn, ifftn
+from scipy.fft import fftn
 
-import tapers
 import _internal
 
 
