@@ -25,7 +25,7 @@ def main():
     rng = np.random.default_rng(0)
 
     h = tapers.tensor_tapers((N, N), W)
-    psd_true = estimation.estimate_psd_tapers(x - proj, h)
+    psd_true = estimation.multitaper(x - proj, h)
 
     def mse(psd_est):
         return np.mean(np.abs(psd_est - psd_true) ** 2)
@@ -41,7 +41,7 @@ def main():
         mask = ~util.disk_mask(N, mask_r * N)
 
         h = tapers.proxy_tapers(mask, W, rng=rng)
-        x_rt = estimation.estimate_psd_tapers(x, h)
+        x_rt = estimation.multitaper(x, h)
 
         mse_rt = mse(x_rt)
 
@@ -52,7 +52,7 @@ def main():
 
         xm = x * mask
 
-        x_mper = estimation.estimate_psd_periodogram(xm, 2)
+        x_mper = estimation.periodogram(xm, 2)
         x_mper *= N ** 2 / np.sum(mask)
 
         mse_mper = mse(x_mper)
@@ -63,7 +63,7 @@ def main():
             print('%-20s%15e' % ('Mask periodogram', mse_mper))
 
         corner_tapers = tapers.corner_tapers(mask, W)
-        x_cmt = estimation.estimate_psd_tapers(x, corner_tapers)
+        x_cmt = estimation.multitaper(x, corner_tapers)
 
         mse_cmt = mse(x_cmt)
 

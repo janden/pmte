@@ -58,7 +58,7 @@ def main():
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, inten)
 
-    multiestim = estimation.estimate_psd_tapers(signal, proxy_tapers)
+    multiestim = estimation.multitaper(signal, proxy_tapers)
     multiestim = np.fft.fftshift(multiestim, axes=(-2, -1))
 
     fname = 'data/mt.bin'

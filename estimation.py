@@ -5,7 +5,7 @@ from scipy.fft import fftn
 import _internal
 
 
-def estimate_psd_periodogram(x, d):
+def periodogram(x, d):
     sig_sz = x.shape[-d:]
 
     xf = fftn(x, axes=range(-d, 0), workers=-1)
@@ -15,7 +15,7 @@ def estimate_psd_periodogram(x, d):
     return x_per
 
 
-def estimate_psd_tapers(x, tapers, use_fftw=True):
+def multitaper(x, tapers, use_fftw=True):
     if use_fftw:
         pyfftw, use_fftw = _internal.try_import_pyfftw()
 

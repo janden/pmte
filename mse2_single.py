@@ -47,7 +47,7 @@ def main():
         W = nmask ** (-1 / 6)
 
         h = tapers.proxy_tapers(mask, W, rng=rng)
-        X_rt = estimation.estimate_psd_tapers(X, h)
+        X_rt = estimation.multitaper(X, h)
 
         err2.append(np.max(np.mean(np.abs(psd_true - X_rt) ** 2, axis=0)))
 

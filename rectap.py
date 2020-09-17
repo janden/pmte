@@ -56,7 +56,7 @@ def main():
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, recinten)
 
-    recmultiestim = estimation.estimate_psd_tapers(signal, rectapers)
+    recmultiestim = estimation.multitaper(signal, rectapers)
     recmultiestim = np.fft.fftshift(recmultiestim, axes=(-2, -1))
 
     fname = 'data/recmt.bin'
@@ -92,7 +92,7 @@ def main():
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, teninten)
 
-    tenmultiestim = estimation.estimate_psd_tapers(signal, tentapers)
+    tenmultiestim = estimation.multitaper(signal, tentapers)
     tenmultiestim = np.fft.fftshift(tenmultiestim, axes=(-2, -1))
 
     fname = 'data/tenmt.bin'
@@ -105,7 +105,7 @@ def main():
 
     rectapers_conv = tapers.proxy_tapers(recmask2, W, n_iter=72, K=K, rng=rng)
 
-    recmultiestim_conv = estimation.estimate_psd_tapers(signal, rectapers_conv)
+    recmultiestim_conv = estimation.multitaper(signal, rectapers_conv)
     recmultiestim_conv = np.fft.fftshift(recmultiestim_conv, axes=(-2, -1))
 
     deviation_conv = calc_error(tenmultiestim, recmultiestim_conv)

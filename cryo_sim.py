@@ -74,7 +74,7 @@ def main():
 
         xm = x * mask
 
-        x_mper = estimation.estimate_psd_periodogram(xm, 2)
+        x_mper = estimation.periodogram(xm, 2)
         x_mper *= N ** 2 / np.sum(mask)
 
         mse_mper = mse(x_mper)
@@ -89,7 +89,7 @@ def main():
             print('%-20s%15e%15e%15e' % ('Masked periodogram', mse_mper, bias_mper, variance_mper))
 
         h = tapers.proxy_tapers(mask, W, rng=rng)
-        x_rt = estimation.estimate_psd_tapers(x, h)
+        x_rt = estimation.multitaper(x, h)
 
         mse_rt = mse(x_rt)
         bias_rt = bias(x_rt)
@@ -103,7 +103,7 @@ def main():
             print('%-20s%15e%15e%15e' % ('Randomtaper', mse_rt, bias_rt, variance_rt))
 
         corner_tapers = tapers.corner_tapers(mask, W)
-        x_cmt = estimation.estimate_psd_tapers(x, corner_tapers)
+        x_cmt = estimation.multitaper(x, corner_tapers)
 
         mse_cmt = mse(x_cmt)
         bias_cmt = bias(x_cmt)
