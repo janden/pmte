@@ -4,10 +4,11 @@ from scipy.fft import fftn, ifftn
 from scipy.signal.windows import dpss
 from scipy.linalg import qr
 
-import pyfftw
-
 
 def concentration_op(mask, W=1 / 4, use_fftw=False):
+    if use_fftw:
+        import pyfftw
+
     d = mask.ndim
 
     W = _ensure_W(W, d)
@@ -263,6 +264,9 @@ def estimate_psd_multitaper(x, d, W=1 / 4, use_fftw=False):
 
 
 def estimate_psd_tapers(x, tapers, use_fftw=False):
+    if use_fftw:
+        import pyfftw
+
     d = tapers.ndim - 1
 
     if d > 2 and use_fftw:
