@@ -23,6 +23,12 @@ def main():
     xi1, xi2 = util.grid((N, N), shifted=True)
     density = density_fun(xi1, xi2)
 
+    def calc_error(ref, est):
+        error = np.sqrt(np.mean(np.abs(est - ref) ** 2))
+        error /= np.sqrt(np.mean(np.abs(ref) ** 2))
+
+        return error
+
     fname = 'data/density.bin'
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, density)
@@ -58,8 +64,7 @@ def main():
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, multiestim)
 
-    error = np.sqrt(np.sum(np.abs(density.ravel() - multiestim.ravel()) ** 2)
-            / np.sum(np.abs(density.ravel()) ** 2))
+    error = calc_error(density, multiestim)
 
     results = {'error': float(error)}
 

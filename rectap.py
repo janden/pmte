@@ -23,6 +23,12 @@ def main():
     xi1, xi2 = util.grid((N, N), shifted=True)
     density = density_fun(xi1, xi2)
 
+    def calc_error(ref, est):
+        error = np.sqrt(np.mean(np.abs(est - ref) ** 2))
+        error /= np.sqrt(np.mean(np.abs(ref) ** 2))
+
+        return error
+
     signal = simulation.generate_field((N, N), 1, psd_fun=density_fun,
             rng=rng, real=False)
     signal = signal[0]
@@ -56,8 +62,7 @@ def main():
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, recmultiestim)
 
-    recerror = np.sqrt(np.sum(np.abs(density.ravel() - recmultiestim.ravel()) ** 2)
-                       / np.sum(np.abs(density.ravel()) ** 2))
+    recerror = calc_error(density, recmultiestim)
 
     N_tensor = int(np.floor(2 * R))
 
@@ -96,11 +101,9 @@ def main():
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, tenmultiestim)
 
-    tenerror = np.sqrt(np.sum(np.abs(density.ravel() - tenmultiestim.ravel()) ** 2)
-                       / np.sum(np.abs(density.ravel()) ** 2))
+    tenerror = calc_error(density, tenmultiestim)
 
-    deviation = np.sqrt(np.sum(np.abs(tenmultiestim.ravel() - recmultiestim.ravel()) ** 2)
-                        / np.sum(np.abs(tenmultiestim.ravel()) ** 2))
+    deviation = calc_error(tenmultiestim, recmultiestim)
 
     rectapers_conv = estimation.calc_rand_tapers(recmask2, W, n_iter=72, K=K,
                                                  rng=rng)
@@ -108,9 +111,7 @@ def main():
     recmultiestim_conv = estimation.estimate_psd_tapers(signal, rectapers_conv)
     recmultiestim_conv = np.fft.fftshift(recmultiestim_conv, axes=(-2, -1))
 
-    deviation_conv = \
-            np.sqrt(np.sum(np.abs(tenmultiestim - recmultiestim_conv) ** 2)
-                    / np.sum(np.abs(tenmultiestim) ** 2))
+    deviation_conv = calc_error(tenmultiestim, recmultiestim_conv)
 
     results = {'recerror': float(recerror),
                'tenerror': float(tenerror),
