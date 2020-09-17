@@ -17,13 +17,12 @@ def main():
     err1 = []
 
     rng = np.random.default_rng(0)
-    gen_fun = rng.standard_normal
 
     err1 = np.empty_like(rs)
 
     for k, r in enumerate(rs):
         mask = util.disk_mask(N, r * N)
-        h = calc_rand_tapers(mask, W, gen_fun=gen_fun, use_fftw=True)
+        h = calc_rand_tapers(mask, W, rng=rng, use_fftw=True)
 
         rho = 1 / h.shape[0] * np.sum(np.abs(np.fft.fft2(h, (Nf,) * 2)) ** 2, axis=0)
 

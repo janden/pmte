@@ -14,7 +14,6 @@ def main():
     mask2 = ~util.disk_mask(N, N * R2)
 
     rng = np.random.default_rng(0)
-    gen_fun = rng.standard_normal
 
     density_fun = lambda xi1, xi2: \
         np.exp(-80 * (xi1 - 0.20) ** 2 - 40 * (xi2 - 0.25) ** 2) \
@@ -29,11 +28,10 @@ def main():
     util.write_gplt_binary_matrix(fname, density)
 
     signal = simulation.generate_field((N, N), 1, psd_fun=density_fun,
-            gen_fun=gen_fun, real=False)
+            rng=rng, real=False)
     signal = signal[0]
 
-    tapers = estimation.calc_rand_tapers(mask2, W,
-                                         gen_fun=gen_fun,
+    tapers = estimation.calc_rand_tapers(mask2, W, rng=rng,
                                          use_fftw=True)
 
     inten = estimation.taper_intensity(tapers)

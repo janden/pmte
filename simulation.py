@@ -3,7 +3,7 @@ import numpy as np
 import util
 
 
-def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, gen_fun=None,
+def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, rng=None,
         real=True):
     if psd_fun is None:
         psd_fun = lambda x, y: np.ones_like(x)
@@ -11,9 +11,10 @@ def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, gen_fun=None,
     if gen_sig_sz is None:
         gen_sig_sz = tuple(2 * sz for sz in sig_sz)
 
-    if gen_fun is None:
+    if rng is None:
         rng = np.random.default_rng()
-        gen_fun = rng.standard_normal
+
+    gen_fun = rng.standard_normal
 
     block_size = 4096
 

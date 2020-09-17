@@ -28,10 +28,8 @@ def main():
         return density
 
     rng = np.random.default_rng(0)
-    gen_fun = rng.standard_normal
 
-    X = simulation.generate_field((N, N), n, psd_fun=psd_fun,
-                                  gen_fun=gen_fun)
+    X = simulation.generate_field((N, N), n, psd_fun=psd_fun, rng=rng)
 
     rs = 2 ** np.linspace(-4, -1, 3 * 4 + 1)
 
@@ -48,7 +46,7 @@ def main():
         W = nmask ** (-1 / 6)
 
         X_rt = estimation.estimate_psd_rand_tapers(X, mask, W=W,
-                                                   gen_fun=gen_fun,
+                                                   rng=rng,
                                                    use_fftw=True)
 
         err2[k] = np.max(np.mean(np.abs(psd_true - X_rt) ** 2, axis=0))

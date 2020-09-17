@@ -14,7 +14,6 @@ def main():
     recmask2 = util.square_mask(N, R)
 
     rng = np.random.default_rng(0)
-    gen_fun = rng.standard_normal
 
     density_fun = lambda xi1, xi2: \
         np.exp(-80 * (xi1 - 0.20) ** 2 - 40 * (xi2 - 0.25) ** 2) \
@@ -25,13 +24,13 @@ def main():
     density = density_fun(xi1, xi2)
 
     signal = simulation.generate_field((N, N), 1, psd_fun=density_fun,
-            gen_fun=gen_fun, real=False)
+            rng=rng, real=False)
     signal = signal[0]
 
     K = int(np.ceil(np.sqrt(np.sum(recmask2)) * W)) ** 2
 
     rectapers = estimation.calc_rand_tapers(recmask2, W, K=K,
-                                            gen_fun=gen_fun,
+                                            rng=rng,
                                             use_fftw=True)
 
     recinten = estimation.taper_intensity(rectapers)
@@ -106,7 +105,7 @@ def main():
                         / np.sum(np.abs(tenmultiestim.ravel()) ** 2))
 
     rectapers_conv = estimation.calc_rand_tapers(recmask2, W, n_iter=72, K=K,
-                                                 gen_fun=gen_fun,
+                                                 rng=rng,
                                                  use_fftw=True)
 
     recmultiestim_conv = estimation.estimate_psd_tapers(signal, rectapers_conv)

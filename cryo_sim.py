@@ -21,10 +21,9 @@ def main():
     psd_fun = lambda x, y: np.exp(-np.hypot(x, y) ** 2 / (2 * width ** 2))
 
     rng = np.random.default_rng(0)
-    gen_fun = rng.standard_normal
 
     x = simulation.generate_field((N, N), n,
-            psd_fun=psd_fun, gen_fun=gen_fun)
+            psd_fun=psd_fun, rng=rng)
 
     sig = util.load_new_sim_images(n)
 
@@ -89,7 +88,7 @@ def main():
             print('%-20s%15e%15e%15e' % ('Masked periodogram', mse_mper, bias_mper, variance_mper))
 
         x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W,
-                use_fftw=True, gen_fun=gen_fun)
+                use_fftw=True, rng=rng)
 
         mse_rt = mse(x_rt)
         bias_rt = bias(x_rt)

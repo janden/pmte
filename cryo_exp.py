@@ -22,7 +22,6 @@ def main():
     N = x.shape[-1]
 
     rng = np.random.default_rng(0)
-    gen_fun = rng.standard_normal
 
     psd_true = estimation.estimate_psd_multitaper(x - proj, 2, W=W,
             use_fftw=True)
@@ -41,7 +40,7 @@ def main():
         mask = ~util.disk_mask(N, mask_r * N)
 
         x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W,
-                gen_fun=gen_fun, use_fftw=True)
+                rng=rng, use_fftw=True)
 
         mse_rt = mse(x_rt)
 
