@@ -19,7 +19,7 @@ def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, gen_fun=None,
 
     d = len(sig_sz)
 
-    grid = util.grid(gen_sig_sz, normalized=True)
+    grid = util.grid(gen_sig_sz)
 
     raveled_grid = [rng.ravel() for rng in grid]
 
