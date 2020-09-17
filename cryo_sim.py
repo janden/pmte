@@ -30,7 +30,7 @@ def main():
 
     x = (x + 10 * sig).astype(sig.dtype)
 
-    xi1, xi2 = util.grid((N, N), normalized=True, shifted=False)
+    xi1, xi2 = util.grid((N, N), normalized=True)
     psd_true = psd_fun(xi1, xi2)
 
     util.write_gplt_binary_matrix('data/cryo_sim_sig1.bin', sig[0])

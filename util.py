@@ -170,7 +170,7 @@ def log_slope(x, y):
     return beta
 
 
-def grid(sz, normalized=False, shifted=True):
+def grid(sz, normalized=False, shifted=False):
     sz = np.array(sz)
 
     if sz.ndim == 0:
@@ -205,7 +205,7 @@ def target_win(Nf, W, shifted=False):
 
 
 def disk_mask(N, R):
-    x1, x2 = grid((N, N))
+    x1, x2 = grid((N, N), shifted=True)
 
     r = np.hypot(x1, x2)
 
@@ -215,7 +215,7 @@ def disk_mask(N, R):
 
 
 def square_mask(N, R):
-    x1, x2 = grid((N, N))
+    x1, x2 = grid((N, N), shifted=True)
 
     mask = (-R <= x1) & (x1 < R) & (-R <= x2) & (x2 < R)
 
