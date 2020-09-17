@@ -1,8 +1,6 @@
 import numpy as np
 import json
 
-from scipy.signal.windows import dpss
-
 import estimation
 import util
 import simulation
