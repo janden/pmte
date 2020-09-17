@@ -21,7 +21,12 @@ def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, gen_fun=None,
 
     grid = util.grid(gen_sig_sz, normalized=True, shifted=False)
 
-    filter_f = np.sqrt(np.maximum(0, psd_fun(*grid)))
+    raveled_grid = [rng.ravel() for rng in grid]
+
+    density = psd_fun(*raveled_grid)
+    density = density.reshape(gen_sig_sz)
+
+    filter_f = np.sqrt(np.maximum(0, density))
 
     if real:
         dtype = 'float64'
