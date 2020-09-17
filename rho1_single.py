@@ -26,7 +26,7 @@ def main():
 
         rho0 = util.target_win(Nf, W)
 
-        err1.append(np.linalg.norm(rho.ravel() - rho0.ravel(), 1) / rho.size)
+        err1.append(np.mean(np.abs(rho - rho0)))
 
     err1 = np.array(err1)
 
