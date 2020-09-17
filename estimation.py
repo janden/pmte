@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 
 from scipy.fft import fftn, ifftn
@@ -5,9 +7,23 @@ from scipy.signal.windows import dpss
 from scipy.linalg import qr
 
 
+def _try_import_pyfftw():
+    try:
+        import pyfftw
+        use_fftw = True
+    except ImportError:
+        warnings.warn('Failed to import pyFFTW. '
+                      'Falling back to SciPy FFT.')
+
+        pyfftw = None
+        use_fftw = False
+
+    return pyfftw, use_fftw
+
+
 def concentration_op(mask, W=1 / 4, use_fftw=False):
     if use_fftw:
-        import pyfftw
+        pyfftw, use_fftw = _try_import_pyfftw()
 
     d = mask.ndim
 
@@ -265,7 +281,7 @@ def estimate_psd_multitaper(x, d, W=1 / 4, use_fftw=False):
 
 def estimate_psd_tapers(x, tapers, use_fftw=False):
     if use_fftw:
-        import pyfftw
+        pyfftw, use_fftw = _try_import_pyfftw()
 
     d = tapers.ndim - 1
 
