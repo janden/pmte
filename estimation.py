@@ -369,7 +369,7 @@ def taper_intensity(tapers, grid_sz=None, shifted=False):
         tapers_f = np.fft.fftshift(tapers_f, axes=range(-d, 0))
 
     inten = np.sum(np.abs(tapers_f) ** 2, axis=0)
-    inten /= np.prod(tapers.shape[1:])
+    inten /= tapers.shape[0]
 
     return inten
 
