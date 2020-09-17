@@ -39,7 +39,7 @@ def main():
 
     tapers = estimation.calc_rand_tapers(mask2, W, rng=rng)
 
-    inten = estimation.taper_intensity(tapers)
+    inten = estimation.taper_intensity(tapers, shifted=True)
 
     fname = 'data/tap1.bin'
     util.ensure_dir_exists(fname)

@@ -37,7 +37,7 @@ def main():
 
     rectapers = estimation.calc_rand_tapers(recmask2, W, K=K, rng=rng)
 
-    recinten = estimation.taper_intensity(rectapers)
+    recinten = estimation.taper_intensity(rectapers, shifted=True)
 
     fname = 'data/rectap1.bin'
     util.ensure_dir_exists(fname)
@@ -73,7 +73,7 @@ def main():
 
     tentapers = np.pad(tapers, ((0, 0),) + (pad,) * 2)
 
-    teninten = estimation.taper_intensity(tentapers)
+    teninten = estimation.taper_intensity(tentapers, shifted=True)
 
     fname = 'data/tentap1.bin'
     util.ensure_dir_exists(fname)
