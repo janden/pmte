@@ -200,7 +200,7 @@ def _orthogonalize(X):
     return Q.T
 
 
-def calc_rand_tapers(mask, W=1 / 4, b=3, K=None, gen_fun=None,
+def calc_rand_tapers(mask, W=1 / 4, b=8, K=None, gen_fun=None,
                      use_fftw=False):
     if gen_fun is None:
         rng = np.random.default_rng()
@@ -244,7 +244,7 @@ def estimate_psd_periodogram(x, d):
     return x_per
 
 
-def estimate_psd_rand_tapers(x, mask, W=1 / 4, b=3,
+def estimate_psd_rand_tapers(x, mask, W=1 / 4, b=8,
         use_fftw=False, gen_fun=None):
     h = calc_rand_tapers(mask, W=W, b=b, gen_fun=gen_fun,
             use_fftw=use_fftw)

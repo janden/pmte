@@ -32,7 +32,7 @@ def main():
             gen_fun=gen_fun, real=False)
     signal = signal[0]
 
-    tapers = estimation.calc_rand_tapers(mask2, W, b=8,
+    tapers = estimation.calc_rand_tapers(mask2, W,
                                          gen_fun=gen_fun,
                                          use_fftw=True)
 

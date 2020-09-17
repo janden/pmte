@@ -23,8 +23,7 @@ def main():
 
     for k, r in enumerate(rs):
         mask = util.disk_mask(N, r * N)
-        h = calc_rand_tapers(mask, W, gen_fun=gen_fun, use_fftw=True,
-                b=8)
+        h = calc_rand_tapers(mask, W, gen_fun=gen_fun, use_fftw=True)
 
         rho = 1 / h.shape[0] * np.sum(np.abs(np.fft.fft2(h, (Nf,) * 2)) ** 2, axis=0)
 

@@ -30,7 +30,7 @@ def main():
 
     K = int(np.ceil(np.sqrt(np.sum(recmask2)) * W)) ** 2
 
-    rectapers = estimation.calc_rand_tapers(recmask2, W, b=8, K=K,
+    rectapers = estimation.calc_rand_tapers(recmask2, W, K=K,
                                             gen_fun=gen_fun,
                                             use_fftw=True)
 

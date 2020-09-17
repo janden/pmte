@@ -41,7 +41,7 @@ def main():
         mask = ~util.disk_mask(N, mask_r * N)
 
         x_rt = estimation.estimate_psd_rand_tapers(x, mask, W=W,
-                gen_fun=gen_fun, b=8, use_fftw=True)
+                gen_fun=gen_fun, use_fftw=True)
 
         mse_rt = mse(x_rt)
 
