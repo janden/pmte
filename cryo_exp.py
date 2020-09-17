@@ -27,69 +27,65 @@ def main():
     h = tapers.tensor_tapers((N, N), W)
     psd_true = estimation.multitaper(x - proj, h)
 
-    def mse(psd_est):
+    def calc_mse(psd_est):
         return np.mean(np.abs(psd_est - psd_true) ** 2)
+
+    def est_mper(x, mask):
+        x_mper = estimation.periodogram(x * mask, 2)
+        x_mper *= N ** 2 / np.sum(mask)
+
+        return x_mper
+
+    def est_pmt(x, mask):
+        h_pmt = tapers.proxy_tapers(mask, W, rng=rng)
+        x_pmt = estimation.multitaper(x, h_pmt)
+
+        return x_pmt
+
+    def est_cmt(x, mask):
+        h_cmt = tapers.corner_tapers(mask, W)
+        x_cmt = estimation.multitaper(x, h_cmt)
+
+        return x_cmt
+
+    methods = {'mper': est_mper, 'cmt': est_cmt, 'pmt': est_pmt}
+
+    mses = {name: [] for name in methods}
 
     if do_print:
         print('%-20s%15s' % ('Estimator', 'MSE'))
 
-    mses_rt = []
-    mses_mper = []
-    mses_cmt = []
-
     for mask_r in mask_rs:
         mask = ~util.disk_mask(N, mask_r * N)
 
-        h = tapers.proxy_tapers(mask, W, rng=rng)
-        x_rt = estimation.multitaper(x, h)
+        for name, method in methods.items():
+            x_est = method(x, mask)
 
-        mse_rt = mse(x_rt)
+            mse = calc_mse(x_est)
 
-        mses_rt.append(mse_rt)
+            if do_print:
+                print('%-20s%15e' % (name, mse))
 
-        if do_print:
-            print('%-20s%15e' % ('Randomtaper', mse_rt))
-
-        xm = x * mask
-
-        x_mper = estimation.periodogram(xm, 2)
-        x_mper *= N ** 2 / np.sum(mask)
-
-        mse_mper = mse(x_mper)
-
-        mses_mper.append(mse_mper)
-
-        if do_print:
-            print('%-20s%15e' % ('Mask periodogram', mse_mper))
-
-        corner_tapers = tapers.corner_tapers(mask, W)
-        x_cmt = estimation.multitaper(x, corner_tapers)
-
-        mse_cmt = mse(x_cmt)
-
-        mses_cmt.append(mse_cmt)
-
-        if do_print:
-            print('%-20s%15e' % ('Corner multitaper', mse_cmt))
+            mses[name].append(mse)
 
     with open('data/cryo_exp.csv', 'w') as f:
         for k in range(len(mask_rs)):
-            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), mses_mper[k],
-                                       mses_cmt[k], mses_rt[k]))
+            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), mses['mper'][k],
+                                       mses['cmt'][k], mses['pmt'][k]))
 
-    min_mse_mper = np.min(mses_mper)
-    min_mse_cmt = np.min(mses_cmt)
-    min_mse_rt = np.min(mses_rt)
+    min_mse_mper = np.min(mses['mper'])
+    min_mse_cmt = np.min(mses['cmt'])
+    min_mse_pmt = np.min(mses['pmt'])
 
-    argmin_mse_rt = 360 * mask_rs[np.argmin(mses_rt)]
+    argmin_mse_pmt = 360 * mask_rs[np.argmin(mses['pmt'])]
 
-    mse_factor_mper = min_mse_mper / min_mse_rt
-    mse_factor_cmt = min_mse_cmt / min_mse_rt
+    mse_factor_mper = min_mse_mper / min_mse_pmt
+    mse_factor_cmt = min_mse_cmt / min_mse_pmt
 
     results = {'min_mse_mper': float(min_mse_mper),
                'min_mse_cmt': float(min_mse_cmt),
-               'min_mse_rt': float(min_mse_rt),
-               'argmin_mse_rt': float(argmin_mse_rt),
+               'min_mse_rt': float(min_mse_pmt),
+               'argmin_mse_rt': float(argmin_mse_pmt),
                'mse_factor_mper': float(mse_factor_mper),
                'mse_factor_cmt': float(mse_factor_cmt)}
 

@@ -48,104 +48,86 @@ def main():
     corner_mask = np.any(np.abs(corner_tapers) > 0, axis=0)
     util.write_gplt_binary_matrix('data/cryo_sim_mask_grid.bin', corner_mask)
 
-    def mse(psd_est):
+    def calc_mse(psd_est):
         return np.mean(np.abs(psd_est - psd_true) ** 2)
 
-    def bias(psd_est):
+    def calc_bias(psd_est):
         return np.mean(np.abs(np.mean(psd_est, axis=0) - psd_true) ** 2)
 
-    def variance(psd_est):
+    def calc_variance(psd_est):
         return np.mean(np.abs(psd_est - np.mean(psd_est, axis=0)) ** 2)
 
-    mses_mper = []
-    variances_mper = []
-    biases_mper = []
+    def est_mper(x, mask):
+        x_mper = estimation.periodogram(x * mask, 2)
+        x_mper *= N ** 2 / np.sum(mask)
 
-    mses_cmt = []
-    variances_cmt = []
-    biases_cmt = []
+        return x_mper
 
-    mses_rt = []
-    variances_rt = []
-    biases_rt = []
+    def est_pmt(x, mask):
+        h_pmt = tapers.proxy_tapers(mask, W, rng=rng)
+        x_pmt = estimation.multitaper(x, h_pmt)
+
+        return x_pmt
+
+    def est_cmt(x, mask):
+        h_cmt = tapers.corner_tapers(mask, W)
+        x_cmt = estimation.multitaper(x, h_cmt)
+
+        return x_cmt
+
+    methods = {'mper': est_mper, 'cmt': est_cmt, 'pmt': est_pmt}
+
+    mses = {name: [] for name in methods}
+    variances = {name: [] for name in methods}
+    biases = {name: [] for name in methods}
 
     for mask_r in mask_rs:
         mask = ~util.disk_mask(N, mask_r * N)
 
-        xm = x * mask
+        for name, method in methods.items():
+            x_est = method(x, mask)
 
-        x_mper = estimation.periodogram(xm, 2)
-        x_mper *= N ** 2 / np.sum(mask)
+            mse = calc_mse(x_est)
+            bias = calc_bias(x_est)
+            variance = calc_variance(x_est)
 
-        mse_mper = mse(x_mper)
-        bias_mper = bias(x_mper)
-        variance_mper = variance(x_mper)
+            if do_print:
+                print('%-20s%15e%15e%15e' % (name, mse, bias, variance))
 
-        mses_mper.append(mse_mper)
-        variances_mper.append(variance_mper)
-        biases_mper.append(bias_mper)
-
-        if do_print:
-            print('%-20s%15e%15e%15e' % ('Masked periodogram', mse_mper, bias_mper, variance_mper))
-
-        h = tapers.proxy_tapers(mask, W, rng=rng)
-        x_rt = estimation.multitaper(x, h)
-
-        mse_rt = mse(x_rt)
-        bias_rt = bias(x_rt)
-        variance_rt = variance(x_rt)
-
-        mses_rt.append(mse_rt)
-        variances_rt.append(variance_rt)
-        biases_rt.append(bias_rt)
-
-        if do_print:
-            print('%-20s%15e%15e%15e' % ('Randomtaper', mse_rt, bias_rt, variance_rt))
-
-        corner_tapers = tapers.corner_tapers(mask, W)
-        x_cmt = estimation.multitaper(x, corner_tapers)
-
-        mse_cmt = mse(x_cmt)
-        bias_cmt = bias(x_cmt)
-        variance_cmt = variance(x_cmt)
-
-        mses_cmt.append(mse_cmt)
-        variances_cmt.append(variance_cmt)
-        biases_cmt.append(bias_cmt)
-
-        if do_print:
-            print('%-20s%15e%15e%15e' % ('Corner multitaper', mse_cmt, bias_cmt, variance_cmt))
+            mses[name].append(mse)
+            biases[name].append(bias)
+            variances[name].append(variance)
 
     with open('data/cryo_sim.csv', 'w') as f:
         for k in range(len(mask_rs)):
-            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), biases_mper[k],
-                                       biases_cmt[k], biases_rt[k]))
+            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), biases['mper'][k],
+                                       biases['cmt'][k], biases['pmt'][k]))
         f.write('\n\n')
 
         for k in range(len(mask_rs)):
-            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), variances_mper[k],
-                                       variances_cmt[k], variances_rt[k]))
+            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), variances['mper'][k],
+                                       variances['cmt'][k], variances['pmt'][k]))
         f.write('\n\n')
 
         for k in range(len(mask_rs)):
-            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), mses_mper[k],
-                                       mses_cmt[k], mses_rt[k]))
+            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), mses['mper'][k],
+                                       mses['cmt'][k], mses['pmt'][k]))
 
-    min_mse_mper = np.min(mses_mper)
-    min_mse_cmt = np.min(mses_cmt)
-    min_mse_rt = np.min(mses_rt)
+    min_mse_mper = np.min(mses['mper'])
+    min_mse_cmt = np.min(mses['cmt'])
+    min_mse_pmt = np.min(mses['pmt'])
 
-    mse_factor_mper = min_mse_mper / min_mse_rt
-    mse_factor_cmt = min_mse_cmt / min_mse_rt
+    mse_factor_mper = min_mse_mper / min_mse_pmt
+    mse_factor_cmt = min_mse_cmt / min_mse_pmt
 
-    min_variance_mper = np.min(variances_mper)
-    min_variance_cmt = np.min(variances_cmt)
-    min_variance_rt = np.min(variances_rt)
+    min_variance_mper = np.min(variances['mper'])
+    min_variance_cmt = np.min(variances['cmt'])
+    min_variance_pmt = np.min(variances['pmt'])
 
-    variance_factor_mper = min_variance_mper / min_variance_rt
-    variance_factor_cmt = min_variance_cmt / min_variance_rt
+    variance_factor_mper = min_variance_mper / min_variance_pmt
+    variance_factor_cmt = min_variance_cmt / min_variance_pmt
 
-    results = {'min_mse_rt': float(min_mse_rt),
+    results = {'min_mse_rt': float(min_mse_pmt),
                'mse_factor_mper': float(mse_factor_mper),
                'mse_factor_cmt': float(mse_factor_cmt),
                'variance_factor_mper': float(variance_factor_mper),
