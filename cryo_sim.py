@@ -2,6 +2,7 @@ import numpy as np
 import json
 
 import estimation
+import tapers
 import simulation
 import util
 
@@ -43,7 +44,7 @@ def main():
     mask = ~util.disk_mask(N, mask_r * N)
     util.write_gplt_binary_matrix('data/cryo_sim_mask.bin', mask)
 
-    corner_tapers = estimation.calc_corner_tapers(mask, W=W)
+    corner_tapers = tapers.corner_tapers(mask, W)
     corner_mask = np.any(np.abs(corner_tapers) > 0, axis=0)
     util.write_gplt_binary_matrix('data/cryo_sim_mask_grid.bin', corner_mask)
 
@@ -100,8 +101,8 @@ def main():
         if do_print:
             print('%-20s%15e%15e%15e' % ('Randomtaper', mse_rt, bias_rt, variance_rt))
 
-        tapers = estimation.calc_corner_tapers(mask, W=W)
-        x_cmt = estimation.estimate_psd_tapers(x, tapers)
+        corner_tapers = tapers.corner_tapers(mask, W)
+        x_cmt = estimation.estimate_psd_tapers(x, corner_tapers)
 
         mse_cmt = mse(x_cmt)
         bias_cmt = bias(x_cmt)

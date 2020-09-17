@@ -1,6 +1,6 @@
 import numpy as np
 
-from estimation import concentration_op
+from tapers import concentration_op
 import util
 
 
@@ -9,7 +9,7 @@ def main():
     W = 7 / 32
 
     mask = np.full((N,), True)
-    op = concentration_op(mask, W=W)
+    op = concentration_op(mask, W)
 
     A = op(np.eye(N))
 

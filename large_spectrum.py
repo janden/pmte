@@ -4,7 +4,7 @@ from scipy.sparse.linalg import LinearOperator, eigs
 from time import time
 from scipy.linalg import subspace_angles
 
-from estimation import concentration_op, calc_rand_tapers
+from tapers import concentration_op, proxy_tapers
 import util
 
 
@@ -32,7 +32,7 @@ def main():
     op = concentration_op(mask, W)
 
     if compare_ref:
-        h = calc_rand_tapers(mask, W=W, n_iter=32)
+        h = proxy_tapers(mask, W, n_iter=32)
 
         # Need this to be a standard 2D matrix.
         h = np.reshape(h, (h.shape[0], -1))

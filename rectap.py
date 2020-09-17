@@ -2,6 +2,7 @@ import numpy as np
 import json
 
 import estimation
+import tapers
 import util
 import simulation
 
@@ -35,9 +36,9 @@ def main():
 
     K = int(np.ceil(np.sqrt(np.sum(recmask2)) * W)) ** 2
 
-    rectapers = estimation.calc_rand_tapers(recmask2, W, K=K, rng=rng)
+    rectapers = tapers.proxy_tapers(recmask2, W, K=K, rng=rng)
 
-    recinten = estimation.taper_intensity(rectapers, shifted=True)
+    recinten = tapers.taper_intensity(rectapers, shifted=True)
 
     fname = 'data/rectap1.bin'
     util.ensure_dir_exists(fname)
@@ -66,14 +67,14 @@ def main():
 
     N_tensor = int(np.floor(2 * R))
 
-    tapers = estimation.calc_tensor_tapers((N_tensor, N_tensor), W=W)
+    smalltapers = tapers.tensor_tapers((N_tensor, N_tensor), W)
 
     pad = (int(np.ceil((N - N_tensor) / 2)),
            int(np.floor((N - N_tensor) / 2)))
 
-    tentapers = np.pad(tapers, ((0, 0),) + (pad,) * 2)
+    tentapers = np.pad(smalltapers, ((0, 0),) + (pad,) * 2)
 
-    teninten = estimation.taper_intensity(tentapers, shifted=True)
+    teninten = tapers.taper_intensity(tentapers, shifted=True)
 
     fname = 'data/tentap1.bin'
     util.ensure_dir_exists(fname)
@@ -102,8 +103,7 @@ def main():
 
     deviation = calc_error(tenmultiestim, recmultiestim)
 
-    rectapers_conv = estimation.calc_rand_tapers(recmask2, W, n_iter=72, K=K,
-                                                 rng=rng)
+    rectapers_conv = tapers.proxy_tapers(recmask2, W, n_iter=72, K=K, rng=rng)
 
     recmultiestim_conv = estimation.estimate_psd_tapers(signal, rectapers_conv)
     recmultiestim_conv = np.fft.fftshift(recmultiestim_conv, axes=(-2, -1))

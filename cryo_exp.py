@@ -3,6 +3,7 @@ import json
 
 import util
 import estimation
+import tapers
 
 
 def main():
@@ -59,8 +60,8 @@ def main():
         if do_print:
             print('%-20s%15e' % ('Mask periodogram', mse_mper))
 
-        tapers = estimation.calc_corner_tapers(mask, W=W)
-        x_cmt = estimation.estimate_psd_tapers(x, tapers)
+        corner_tapers = tapers.corner_tapers(mask, W)
+        x_cmt = estimation.estimate_psd_tapers(x, corner_tapers)
 
         mse_cmt = mse(x_cmt)
 

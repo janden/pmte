@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from scipy.linalg import subspace_angles
 
-from estimation import concentration_op
+from tapers import concentration_op
 from scipy.signal.windows import dpss
 
 
@@ -63,7 +63,7 @@ def concentration_prob_1d(n, use_fft=False):
     V, E = slepian_tapers(n, W)
 
     if use_fft:
-        op_orig = concentration_op(np.full(n, True), W=W)
+        op_orig = concentration_op(np.full(n, True), W)
         op = lambda x: op_orig(x.T).T
     else:
         op = lambda x: V @ (E[:, np.newaxis] * (V.T @ x))
@@ -77,7 +77,7 @@ def concentration_prob_2d(n, use_fft=False):
     V, E = tensor_tapers(n, W)
 
     if use_fft:
-        op_orig = concentration_op(np.full((n,) * 2, True), W=W)
+        op_orig = concentration_op(np.full((n,) * 2, True), W)
         op = lambda x: op_orig(x.T).T
     else:
         op = lambda x: V @ (E[:, np.newaxis] * (V.T @ x))

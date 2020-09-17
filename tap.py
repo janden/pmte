@@ -2,6 +2,7 @@ import numpy as np
 import json
 
 import estimation
+import tapers
 import simulation
 import util
 
@@ -37,27 +38,27 @@ def main():
             rng=rng, real=False)
     signal = signal[0]
 
-    tapers = estimation.calc_rand_tapers(mask2, W, rng=rng)
+    proxy_tapers = tapers.proxy_tapers(mask2, W, rng=rng)
 
-    inten = estimation.taper_intensity(tapers, shifted=True)
+    inten = tapers.taper_intensity(proxy_tapers, shifted=True)
 
     fname = 'data/tap1.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tapers[0, :, :])
+    util.write_gplt_binary_matrix(fname, proxy_tapers[0, :, :])
 
     fname = 'data/tap2.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tapers[1, :, :])
+    util.write_gplt_binary_matrix(fname, proxy_tapers[1, :, :])
 
     fname = 'data/tap17.bin'
     util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tapers[16, :, :])
+    util.write_gplt_binary_matrix(fname, proxy_tapers[16, :, :])
 
     fname = 'data/inten.bin'
     util.ensure_dir_exists(fname)
     util.write_gplt_binary_matrix(fname, inten)
 
-    multiestim = estimation.estimate_psd_tapers(signal, tapers)
+    multiestim = estimation.estimate_psd_tapers(signal, proxy_tapers)
     multiestim = np.fft.fftshift(multiestim, axes=(-2, -1))
 
     fname = 'data/mt.bin'
