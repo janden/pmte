@@ -1,5 +1,7 @@
 import numpy as np
 
+import util
+
 
 def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, gen_fun=None,
         real=True):
@@ -17,10 +19,9 @@ def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, gen_fun=None,
 
     d = len(sig_sz)
 
-    rngs = [np.fft.fftfreq(sz) for sz in gen_sig_sz]
-    grids = np.meshgrid(*rngs, indexing='ij')
+    grid = util.grid(gen_sig_sz, normalized=True, shifted=False)
 
-    filter_f = np.sqrt(np.maximum(0, psd_fun(*grids)))
+    filter_f = np.sqrt(np.maximum(0, psd_fun(*grid)))
 
     if real:
         dtype = 'float64'
