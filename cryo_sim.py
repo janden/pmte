@@ -25,7 +25,7 @@ def main():
     x = simulation.generate_field((N, N), n,
             psd_fun=psd_fun, rng=rng)
 
-    sig = util.load_new_sim_images(n)
+    sig = util.load_sim_images(n)
 
     x = (x + 10 * sig).astype(sig.dtype)
 

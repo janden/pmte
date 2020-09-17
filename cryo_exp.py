@@ -14,7 +14,7 @@ def main():
 
     do_print = True
 
-    x, proj = util.load_new_exp_images(n)
+    x, proj = util.load_exp_images(n)
 
     util.write_gplt_binary_matrix('data/cryo_exp_sig_noise1.bin', x[0])
     util.write_gplt_binary_matrix('data/cryo_exp_sig_noise2.bin', x[1])

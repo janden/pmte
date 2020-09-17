@@ -65,27 +65,6 @@ def centered_ifftn(x, d):
 
 
 def load_sim_images(n=1000):
-    filename = 'signal.bin'
-    dtype = np.uint8
-    shape = (1000, 128, 128)
-
-    if n > shape[0]:
-        raise RuntimeError('n must be smaller than %d.' % shape[0])
-
-    with open(filename, 'rb') as f:
-        buf = f.read()
-    buf = gzip.decompress(buf)
-
-    im = np.frombuffer(buf, dtype=dtype)
-    im = im.reshape(shape)
-    im = im.astype(np.float32) / 255
-
-    im = im[:n]
-
-    return im
-
-
-def load_new_sim_images(n=1000):
     filename = 'signal.npz'
 
     f = np.load(filename)
@@ -109,28 +88,7 @@ def load_new_sim_images(n=1000):
     return ims
 
 
-def load_exp_images(n=1024):
-    filename = 'first1024.mat'
-
-    from scipy.io import loadmat
-
-    f = loadmat(filename)
-
-    im = f['im'].T
-    proj = f['proj'].T
-    groups = f['groups'][0]
-
-    if n > im.shape[0]:
-        raise RuntimeError('n must be smaller than %d.' % im.shape[0])
-
-    im = im[:n]
-    proj = proj[:n]
-    groups = groups[:n]
-
-    return im, proj, groups
-
-
-def load_new_exp_images(n=120):
+def load_exp_images(n=120):
     filename = 'exp.npz'
 
     f = np.load(filename)
