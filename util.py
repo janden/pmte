@@ -190,12 +190,7 @@ def grid(sz, normalized=False, shifted=True):
 
 
 def target_win(Nf, W, shifted=False):
-    fX, fY = grid((Nf, Nf))
-    fX, fY = fX / Nf, fY / Nf
-
-    if not shifted:
-        fX = np.fft.ifftshift(fX)
-        fY = np.fft.ifftshift(fY)
+    fX, fY = grid((Nf, Nf), normalized=True, shifted=shifted)
 
     rho = np.zeros((Nf, Nf))
 
