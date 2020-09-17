@@ -105,7 +105,7 @@ def main():
     deviation = np.sqrt(np.sum(np.abs(tenmultiestim.ravel() - recmultiestim.ravel()) ** 2)
                         / np.sum(np.abs(tenmultiestim.ravel()) ** 2))
 
-    rectapers_conv = estimation.calc_rand_tapers(recmask2, W, b=72, K=K,
+    rectapers_conv = estimation.calc_rand_tapers(recmask2, W, n_iter=72, K=K,
                                                  gen_fun=gen_fun,
                                                  use_fftw=True)
 
