@@ -68,13 +68,10 @@ def main():
 
     tapers = estimation.calc_tensor_tapers((N_tensor, N_tensor), W=W)
 
-    tentapers = np.zeros((tapers.shape[0], N, N))
+    pad = (int(np.ceil((N - N_tensor) / 2)),
+           int(np.floor((N - N_tensor) / 2)))
 
-    mid = int(np.ceil((N + 1) / 2) - 1)
-    ext1 = int(np.ceil((N_tensor - 1) / 2))
-    ext2 = int(np.floor((N_tensor - 1) / 2) + 1)
-
-    tentapers[:, mid - ext1:mid + ext2, mid - ext1:mid + ext2] = tapers
+    tentapers = np.pad(tapers, ((0, 0),) + (pad,) * 2)
 
     teninten = estimation.taper_intensity(tentapers)
 
