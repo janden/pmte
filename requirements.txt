@@ -2,4 +2,3 @@ numpy
 scipy
 pyfftw
 matplotlib
-oct2py

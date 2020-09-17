@@ -3,8 +3,6 @@ import json
 
 from scipy.special import jv
 
-import oct2py
-
 import simulation
 import estimation
 import util
