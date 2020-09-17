@@ -16,26 +16,6 @@ def estimate_psd_periodogram(x, d):
     return x_per
 
 
-def estimate_psd_rand_tapers(x, mask, W=1 / 4, n_iter=8,
-        use_fftw=True, rng=None):
-    h = tapers.proxy_tapers(mask, W, n_iter=n_iter, rng=rng,
-            use_fftw=use_fftw)
-
-    x_rt = estimate_psd_tapers(x, h, use_fftw=use_fftw)
-
-    return x_rt
-
-
-def estimate_psd_multitaper(x, d, W=1 / 4, use_fftw=True):
-    shape = x.shape[-d:]
-
-    h = tapers.tensor_tapers(shape, W)
-
-    x_mt = estimate_psd_tapers(x, h, use_fftw=use_fftw)
-
-    return x_mt
-
-
 def estimate_psd_tapers(x, tapers, use_fftw=True):
     if use_fftw:
         pyfftw, use_fftw = _internal.try_import_pyfftw()

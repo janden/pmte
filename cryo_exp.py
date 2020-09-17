@@ -24,7 +24,8 @@ def main():
 
     rng = np.random.default_rng(0)
 
-    psd_true = estimation.estimate_psd_multitaper(x - proj, 2, W)
+    h = tapers.tensor_tapers((N, N), W)
+    psd_true = estimation.estimate_psd_tapers(x - proj, h)
 
     def mse(psd_est):
         return np.mean(np.abs(psd_est - psd_true) ** 2)
@@ -39,7 +40,8 @@ def main():
     for mask_r in mask_rs:
         mask = ~util.disk_mask(N, mask_r * N)
 
-        x_rt = estimation.estimate_psd_rand_tapers(x, mask, W, rng=rng)
+        h = tapers.proxy_tapers(mask, W, rng=rng)
+        x_rt = estimation.estimate_psd_tapers(x, h)
 
         mse_rt = mse(x_rt)
 

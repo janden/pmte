@@ -6,6 +6,7 @@ from scipy.integrate import fixed_quad
 
 import simulation
 import estimation
+import tapers
 import util
 
 
@@ -45,7 +46,8 @@ def main():
 
         W = nmask ** (-1 / 6)
 
-        X_rt = estimation.estimate_psd_rand_tapers(X, mask, W, rng=rng)
+        h = tapers.proxy_tapers(mask, W, rng=rng)
+        X_rt = estimation.estimate_psd_tapers(X, h)
 
         err2.append(np.max(np.mean(np.abs(psd_true - X_rt) ** 2, axis=0)))
 
