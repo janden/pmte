@@ -2,7 +2,7 @@ import numpy as np
 import json
 
 import util
-from estimation import calc_rand_tapers
+import estimation
 
 
 def main():
@@ -20,9 +20,9 @@ def main():
 
     for r in rs:
         mask = util.disk_mask(N, r * N)
-        h = calc_rand_tapers(mask, W, rng=rng)
+        h = estimation.calc_rand_tapers(mask, W, rng=rng)
 
-        rho = 1 / h.shape[0] * np.sum(np.abs(np.fft.fft2(h, (Nf,) * 2)) ** 2, axis=0)
+        rho = estimation.taper_intensity(h, grid_sz=(Nf, Nf))
 
         rho0 = util.target_win(Nf, W)
 
