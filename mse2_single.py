@@ -2,6 +2,7 @@ import numpy as np
 import json
 
 from scipy.special import jv
+from scipy.integrate import fixed_quad
 
 import simulation
 import estimation
@@ -12,34 +13,24 @@ def main():
     N = 128
     n = 200
 
-    # TODO: These weights do not seem to correspond exactly to those of lgwt.
-    omegan, omegaw = np.polynomial.legendre.leggauss(200)
-    omegan = (omegan + 1) / 2 * 100
-    omegaw = omegaw / 2 * 100
+    def psd_fun(x, y):
+        quadrature = lambda func: fixed_quad(func, 0, 100, n=200)[0]
 
-    def _psd_fun(x, y):
+        kernel = lambda u, xi: (jv(0, 8 * xi[..., np.newaxis] * u)
+                                * (jv(1, u) / u) ** 3 * u)
+
         r = np.hypot(x, y)
 
-        c = np.sum(omegaw * omegan * (jv(1, omegan) / omegan) ** 3)
+        c = quadrature(lambda u: kernel(u, np.zeros(1)))
 
-        return 1 / c * np.sum(jv(0, 8 * r[:, np.newaxis] * omegan) * omegaw * omegan
-                              * (jv(1, omegan) / omegan) ** 3, axis=-1)
+        density = 1 / c * quadrature(lambda u: kernel(u, r))
 
-    def _vectorized_psd_fun(*coords):
-        sz = coords[0].shape
-
-        coords = [coord.ravel() for coord in coords]
-
-        val = _psd_fun(*coords)
-
-        val = np.reshape(val, sz)
-
-        return val
+        return density
 
     rng = np.random.default_rng(0)
     gen_fun = rng.standard_normal
 
-    X = simulation.generate_field((N, N), n, psd_fun=_vectorized_psd_fun,
+    X = simulation.generate_field((N, N), n, psd_fun=psd_fun,
                                   gen_fun=gen_fun)
 
     rs = 2 ** np.linspace(-4, -1, 3 * 4 + 1)
@@ -48,7 +39,7 @@ def main():
     caro2 = np.empty_like(rs)
 
     xi1, xi2 = util.grid((N, N), normalized=True, shifted=False)
-    psd_true = _vectorized_psd_fun(xi1, xi2)
+    psd_true = psd_fun(xi1, xi2)
 
     for k, r in enumerate(rs):
         mask = util.disk_mask(N, r * N)
