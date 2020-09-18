@@ -89,3 +89,11 @@ def load_exp_images(n=120):
     projs = projs0[:n]
 
     return ims, projs
+
+
+def save_image(name, image):
+    filename = os.path.join(_root_dir(), 'data', name + '.bin')
+
+    ensure_dir_exists(filename)
+
+    write_gplt_binary_matrix(filename, image)
