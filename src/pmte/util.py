@@ -29,12 +29,6 @@ def write_gplt_binary_matrix(filename, A, lab1=None, lab2=None):
         f.write(M.astype(np.float32).tobytes('F'))
 
 
-def cos_max_principal_angle(X, Y):
-    theta = np.max(subspace_angles(X.T, Y.T))
-
-    return np.cos(theta)
-
-
 def subspace_dist(X, Y):
     theta = np.max(subspace_angles(X.T, Y.T))
 
@@ -45,22 +39,6 @@ def load_float32(fname):
     with open(fname, 'rb') as f:
         buf = f.read()
     return np.frombuffer(buf, dtype=np.float32)
-
-
-def centered_fftn(x, d):
-    x = np.fft.ifftshift(x, axes=range(-d, 0))
-    x = np.fft.fftn(x, axes=range(-d, 0))
-    x = np.fft.fftshift(x, axes=range(-d, 0))
-
-    return x
-
-
-def centered_ifftn(x, d):
-    x = np.fft.ifftshift(x, axes=range(-d, 0))
-    x = np.fft.ifftn(x, axes=range(-d, 0))
-    x = np.fft.fftshift(x, axes=range(-d, 0))
-
-    return x
 
 
 def load_sim_images(n=1000):
