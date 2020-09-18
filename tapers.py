@@ -37,7 +37,7 @@ def concentration_op(mask, W=1 / 4, use_fftw=True):
 
     if use_fftw:
         in_array = pyfftw.empty_aligned((block_size,) + fft_sig_sz,
-                                         dtype='float64')
+                                        dtype='float64')
         out_array = pyfftw.empty_aligned((block_size,) + fft_sig_sz[:-1]
                                          + (fft_sig_sz[-1] // 2 + 1,),
                                          dtype='complex128')
@@ -48,9 +48,9 @@ def concentration_op(mask, W=1 / 4, use_fftw=True):
                                    threads=n_threads)
 
         plan_backward = pyfftw.FFTW(out_array, in_array, axes=range(-d, 0),
-                                   direction='FFTW_BACKWARD',
-                                   flags=('FFTW_MEASURE',),
-                                   threads=n_threads)
+                                    direction='FFTW_BACKWARD',
+                                    flags=('FFTW_MEASURE',),
+                                    threads=n_threads)
 
         freq_mask = freq_mask[..., :out_array.shape[-1]]
 
@@ -271,7 +271,9 @@ def _ensure_W(W, d):
 
 
 def _fit_corner_mask(mask):
-    last_true = lambda x: np.argmax(~x)
+    def last_true(x):
+        """Return index of last true element"""
+        return np.argmax(~x)
 
     # Side lengths of squares fitting in the top left, bottom left, bottom
     # right, and top right corners of the mask.
