@@ -14,24 +14,15 @@ def main():
 
     mask1 = util.target_win(N, W, shifted=True)
 
-    fname = 'data/mask1.bin'
-
-    datahelpers.ensure_dir_exists(fname)
-    datahelpers.write_gplt_binary_matrix(fname, mask1)
+    datahelpers.save_image('mask1', mask1)
 
     mask2 = ~util.disk_mask(N, R)
 
-    fname = 'data/mask2.bin'
-
-    datahelpers.ensure_dir_exists(fname)
-    datahelpers.write_gplt_binary_matrix(fname, mask2)
+    datahelpers.save_image('mask2', mask2)
 
     recmask2 = util.square_mask(N, R)
 
-    fname = 'data/recmask2.bin'
-
-    datahelpers.ensure_dir_exists(fname)
-    datahelpers.write_gplt_binary_matrix(fname, recmask2)
+    datahelpers.save_image('recmask2', recmask2)
 
 if __name__ == '__main__':
     main()

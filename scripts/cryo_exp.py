@@ -20,8 +20,8 @@ def main():
 
     x, proj = datahelpers.load_exp_images(n)
 
-    datahelpers.write_gplt_binary_matrix('data/cryo_exp_sig_noise1.bin', x[0])
-    datahelpers.write_gplt_binary_matrix('data/cryo_exp_sig_noise2.bin', x[1])
+    datahelpers.save_image('cryo_exp_sig_noise1', x[0])
+    datahelpers.save_image('cryo_exp_sig_noise2', x[1])
 
     N = x.shape[-1]
 

@@ -32,9 +32,7 @@ def main():
 
         return error
 
-    fname = 'data/density.bin'
-    datahelpers.ensure_dir_exists(fname)
-    datahelpers.write_gplt_binary_matrix(fname, density)
+    datahelpers.save_image('density', density)
 
     signal = simulation.generate_field((N, N), 1, psd_fun=density_fun,
             rng=rng, real=False)
@@ -44,28 +42,16 @@ def main():
 
     inten = tapers.taper_intensity(proxy_tapers, shifted=True)
 
-    fname = 'data/tap1.bin'
-    datahelpers.ensure_dir_exists(fname)
-    datahelpers.write_gplt_binary_matrix(fname, proxy_tapers[0, :, :])
+    datahelpers.save_image('tap1', proxy_tapers[0])
+    datahelpers.save_image('tap2', proxy_tapers[1])
+    datahelpers.save_image('tap17', proxy_tapers[16])
 
-    fname = 'data/tap2.bin'
-    datahelpers.ensure_dir_exists(fname)
-    datahelpers.write_gplt_binary_matrix(fname, proxy_tapers[1, :, :])
-
-    fname = 'data/tap17.bin'
-    datahelpers.ensure_dir_exists(fname)
-    datahelpers.write_gplt_binary_matrix(fname, proxy_tapers[16, :, :])
-
-    fname = 'data/inten.bin'
-    datahelpers.ensure_dir_exists(fname)
-    datahelpers.write_gplt_binary_matrix(fname, inten)
+    datahelpers.save_image('inten', inten)
 
     multiestim = estimation.multitaper(signal, proxy_tapers)
     multiestim = np.fft.fftshift(multiestim, axes=(-2, -1))
 
-    fname = 'data/mt.bin'
-    datahelpers.ensure_dir_exists(fname)
-    datahelpers.write_gplt_binary_matrix(fname, multiestim)
+    datahelpers.save_image('mt', multiestim)
 
     error = calc_error(density, multiestim)
 

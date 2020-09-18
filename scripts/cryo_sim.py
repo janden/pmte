@@ -35,20 +35,20 @@ def main():
     xi1, xi2 = util.grid((N, N))
     psd_true = psd_fun(xi1, xi2)
 
-    datahelpers.write_gplt_binary_matrix('data/cryo_sim_sig1.bin', sig[0])
-    datahelpers.write_gplt_binary_matrix('data/cryo_sim_sig2.bin', sig[1])
-    datahelpers.write_gplt_binary_matrix('data/cryo_sim_sig_noise1.bin', x[0])
-    datahelpers.write_gplt_binary_matrix('data/cryo_sim_sig_noise2.bin', x[1])
-    datahelpers.write_gplt_binary_matrix('data/cryo_sim_psd.bin',
-                                  np.fft.ifftshift(psd_true, axes=(-2, -1)))
+    datahelpers.save_image('cryo_sim_sig1', sig[0])
+    datahelpers.save_image('cryo_sim_sig2', sig[1])
+    datahelpers.save_image('cryo_sim_sig_noise1', x[0])
+    datahelpers.save_image('cryo_sim_sig_noise2', x[1])
+    datahelpers.save_image('cryo_sim_psd',
+                           np.fft.ifftshift(psd_true, axes=(-2, -1)))
 
     mask_r = 60 / 128
     mask = ~util.disk_mask(N, mask_r * N)
-    datahelpers.write_gplt_binary_matrix('data/cryo_sim_mask.bin', mask)
+    datahelpers.save_image('cryo_sim_mask', mask)
 
     corner_tapers = tapers.corner_tapers(mask, W)
     corner_mask = np.any(np.abs(corner_tapers) > 0, axis=0)
-    datahelpers.write_gplt_binary_matrix('data/cryo_sim_mask_grid.bin', corner_mask)
+    datahelpers.save_image('cryo_sim_mask_grid', corner_mask)
 
     def calc_mse(psd_est):
         return np.mean(np.abs(psd_est - psd_true) ** 2)
