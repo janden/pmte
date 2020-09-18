@@ -20,13 +20,9 @@ def main():
 
     D = D[::-1]
 
-    fname = 'data/spectrum.csv'
+    idx = np.arange(1, len(D) + 1)
 
-    datahelpers.ensure_dir_exists(fname)
-
-    with open(fname, 'w') as f:
-        for k, lam in enumerate(D):
-            f.write('%d %.15g\n' % (k + 1, lam))
+    datahelpers.save_table('spectrum', idx, D)
 
 
 if __name__ == '__main__':

@@ -98,20 +98,16 @@ def main():
             biases[name].append(bias)
             variances[name].append(variance)
 
-    with open('data/cryo_sim.csv', 'w') as f:
-        for k in range(len(mask_rs)):
-            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), biases['mper'][k],
-                                       biases['cmt'][k], biases['pmt'][k]))
-        f.write('\n\n')
+    datahelpers.save_table('cryo_sim_biases', np.round(N * mask_rs),
+                           biases['mper'], biases['cmt'], biases['pmt'])
 
-        for k in range(len(mask_rs)):
-            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), variances['mper'][k],
-                                       variances['cmt'][k], variances['pmt'][k]))
-        f.write('\n\n')
+    datahelpers.save_table('cryo_sim_variances', np.round(N * mask_rs),
+                           variances['mper'], variances['cmt'],
+                           variances['pmt'])
 
-        for k in range(len(mask_rs)):
-            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), mses['mper'][k],
-                                       mses['cmt'][k], mses['pmt'][k]))
+    datahelpers.save_table('cryo_sim_mses', np.round(N * mask_rs),
+                           mses['mper'], mses['cmt'],
+                           mses['pmt'])
 
     min_mse_mper = np.min(mses['mper'])
     min_mse_cmt = np.min(mses['cmt'])

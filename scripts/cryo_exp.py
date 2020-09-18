@@ -69,10 +69,8 @@ def main():
 
             mses[name].append(mse)
 
-    with open('data/cryo_exp.csv', 'w') as f:
-        for k in range(len(mask_rs)):
-            f.write('%d %g %g %g\n' % (round(N * mask_rs[k]), mses['mper'][k],
-                                       mses['cmt'][k], mses['pmt'][k]))
+    datahelpers.save_table('cryo_exp', np.round(N * mask_rs), mses['mper'],
+                           mses['cmt'], mses['pmt'])
 
     min_mse_mper = np.min(mses['mper'])
     min_mse_cmt = np.min(mses['cmt'])

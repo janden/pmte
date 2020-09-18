@@ -55,13 +55,7 @@ def main():
     err2 = np.array(err2)
     caro2 = np.array(caro2)
 
-    fname = 'data/mse2_single.csv'
-
-    datahelpers.ensure_dir_exists(fname)
-
-    with open(fname, 'w') as f:
-        for r, err in zip(rs, err2):
-            f.write('%.15g %.15g\n' % (r * N, err))
+    datahelpers.save_table('mse2_single', rs * N, err2)
 
     beta = util.log_slope(rs * N, err2 / np.log(caro2) ** 2)
 

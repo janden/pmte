@@ -32,13 +32,7 @@ def main():
 
     err1 = np.array(err1)
 
-    fname = 'data/rho1_single.csv'
-
-    datahelpers.ensure_dir_exists(fname)
-
-    with open(fname, 'w') as f:
-        for r, err in zip(rs, err1):
-            f.write('%.15g %.15g\n' % (r * N, err))
+    datahelpers.save_table('rho1_single', rs * N, err1)
 
     beta = util.log_slope(rs * N, err1)
 
