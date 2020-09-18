@@ -4,9 +4,10 @@ import util
 
 
 def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, rng=None,
-        real=True):
+                   real=True):
     if psd_fun is None:
-        psd_fun = lambda x, y: np.ones_like(x)
+        def psd_fun(x, y):
+            return np.ones_like(x)
 
     if gen_sig_sz is None:
         gen_sig_sz = tuple(2 * sz for sz in sig_sz)
