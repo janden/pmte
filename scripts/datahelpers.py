@@ -100,6 +100,21 @@ def save_image(name, image):
     write_gplt_binary_matrix(filename, image)
 
 
+def save_table(name, *args):
+    filename = os.path.join(_root_dir(), 'data', name + '.csv')
+
+    n_cols = len(args)
+
+    ensure_dir_exists(filename)
+
+    fmt = ' '.join(('%.15g',) * n_cols)
+
+    with open(filename, 'w') as f:
+        for vals in zip(*args):
+            line = fmt % vals
+            f.write(line + '\n')
+
+
 def save_json(name, values):
     filename = os.path.join(_root_dir(), 'data', name + '.json')
 
