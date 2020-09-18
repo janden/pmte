@@ -1,3 +1,5 @@
+set -e
+
 python3 scripts/spectrum.py
 python3 scripts/masks.py
 python3 scripts/rectap.py
