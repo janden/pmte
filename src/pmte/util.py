@@ -64,7 +64,8 @@ def centered_ifftn(x, d):
 
 
 def load_sim_images(n=1000):
-    filename = 'signal.npz'
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(dirname, '..', '..', 'data', 'signal.npz')
 
     f = np.load(filename)
 
@@ -88,7 +89,8 @@ def load_sim_images(n=1000):
 
 
 def load_exp_images(n=120):
-    filename = 'exp.npz'
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(dirname, '..', '..', 'data', 'exp.npz')
 
     f = np.load(filename)
 

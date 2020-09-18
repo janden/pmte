@@ -1,6 +1,6 @@
 import numpy as np
 
-import util
+from pmte import util
 
 
 def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, rng=None,

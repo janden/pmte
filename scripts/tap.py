@@ -1,11 +1,14 @@
+import sys
+import os
+
+dirname = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(dirname, '..', 'src'))
+
 import json
 
 import numpy as np
 
-import estimation
-import simulation
-import tapers
-import util
+from pmte import estimation, simulation, tapers, util
 
 
 def main():

@@ -1,8 +1,8 @@
-python3 spectrum.py
-python3 masks.py
-python3 rectap.py
-python3 tap.py
-python3 mse2_single.py
-python3 rho1_single.py
-python3 cryo_sim.py
-python3 cryo_exp.py
+python3 scripts/spectrum.py
+python3 scripts/masks.py
+python3 scripts/rectap.py
+python3 scripts/tap.py
+python3 scripts/mse2_single.py
+python3 scripts/rho1_single.py
+python3 scripts/cryo_sim.py
+python3 scripts/cryo_exp.py

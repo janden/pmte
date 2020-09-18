@@ -1,9 +1,15 @@
+import sys
+import os
+
+dirname = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(dirname, '..', 'src'))
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.linalg import subspace_angles
 from scipy.signal.windows import dpss
 
-from tapers import concentration_op
+from pmte.tapers import concentration_op
 
 
 def gaussian_prob(n):

@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.fft import fftn
 
-import _internal
+from pmte import _internal
 
 
 def periodogram(x, d):

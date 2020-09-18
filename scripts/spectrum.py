@@ -1,7 +1,13 @@
+import sys
+import os
+
+dirname = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(dirname, '..', 'src'))
+
 import numpy as np
 
-import util
-from tapers import concentration_op
+from pmte import util
+from pmte.tapers import concentration_op
 
 
 def main():

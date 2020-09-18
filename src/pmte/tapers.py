@@ -3,7 +3,7 @@ from scipy.fft import fftn, ifftn
 from scipy.linalg import qr
 from scipy.signal.windows import dpss
 
-import _internal
+from pmte import _internal
 
 
 def concentration_op(mask, W=1 / 4, use_fftw=True):

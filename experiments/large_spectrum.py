@@ -1,3 +1,9 @@
+import sys
+import os
+
+dirname = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(dirname, '..', 'src'))
+
 from time import time
 
 import matplotlib.pyplot as plt
@@ -5,8 +11,8 @@ import numpy as np
 from scipy.linalg import subspace_angles
 from scipy.sparse.linalg import LinearOperator, eigs
 
-import util
-from tapers import concentration_op, proxy_tapers
+from pmte import util
+from pmte.tapers import concentration_op, proxy_tapers
 
 
 def main():

@@ -3,8 +3,6 @@ import sys
 
 import numpy as np
 
-import util
-
 
 def main():
     args = sys.argv[1:]
