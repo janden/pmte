@@ -7,6 +7,7 @@ from scipy.linalg import subspace_angles
 
 from scipy.ndimage import rotate
 
+
 def ensure_dir_exists(filename):
     dirname = os.path.dirname(filename)
     os.makedirs(dirname, exist_ok=True)
@@ -70,7 +71,7 @@ def load_sim_images(n=1000):
     f = np.load(filename)
 
     ims0 = f['ims']
-    ims0 = ims0.astype(np.float32)/ 255
+    ims0 = ims0.astype(np.float32) / 255
 
     n0 = ims0.shape[0]
     sz0 = ims0.shape[-2:]
