@@ -29,12 +29,6 @@ def write_gplt_binary_matrix(filename, A, lab1=None, lab2=None):
         f.write(M.astype(np.float32).tobytes('F'))
 
 
-def subspace_dist(X, Y):
-    theta = np.max(subspace_angles(X.T, Y.T))
-
-    return np.sin(theta)
-
-
 def load_float32(fname):
     with open(fname, 'rb') as f:
         buf = f.read()

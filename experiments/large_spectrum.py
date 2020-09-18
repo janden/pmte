@@ -15,6 +15,12 @@ from pmte import util
 from pmte.tapers import concentration_op, proxy_tapers
 
 
+def subspace_dist(X, Y):
+    theta = np.max(subspace_angles(X.T, Y.T))
+
+    return np.sin(theta)
+
+
 def main():
     N = 128
 
@@ -108,7 +114,7 @@ def main():
 
         print('corr = %.15g' % corr)
 
-        dist = util.subspace_dist(X, h)
+        dist = subspace_dist(X, h)
 
         print('dist = %.15g' % dist)
 
