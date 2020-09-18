@@ -2,8 +2,9 @@ import _preamble
 
 import numpy as np
 
-from pmte import util
 from pmte.tapers import concentration_op
+
+import datahelpers
 
 
 def main():
@@ -21,7 +22,7 @@ def main():
 
     fname = 'data/spectrum.csv'
 
-    util.ensure_dir_exists(fname)
+    datahelpers.ensure_dir_exists(fname)
 
     with open(fname, 'w') as f:
         for k, lam in enumerate(D):

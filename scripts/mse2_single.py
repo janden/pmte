@@ -8,6 +8,8 @@ from scipy.special import jv
 
 from pmte import estimation, simulation, tapers, util
 
+import datahelpers
+
 
 def main():
     N = 128
@@ -57,7 +59,7 @@ def main():
 
     fname = 'data/mse2_single.csv'
 
-    util.ensure_dir_exists(fname)
+    datahelpers.ensure_dir_exists(fname)
 
     with open(fname, 'w') as f:
         for r, err in zip(rs, err2):

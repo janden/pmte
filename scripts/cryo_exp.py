@@ -6,6 +6,8 @@ import numpy as np
 
 from pmte import estimation, tapers, util
 
+import datahelpers
+
 
 def main():
     n = 120
@@ -16,10 +18,10 @@ def main():
 
     do_print = True
 
-    x, proj = util.load_exp_images(n)
+    x, proj = datahelpers.load_exp_images(n)
 
-    util.write_gplt_binary_matrix('data/cryo_exp_sig_noise1.bin', x[0])
-    util.write_gplt_binary_matrix('data/cryo_exp_sig_noise2.bin', x[1])
+    datahelpers.write_gplt_binary_matrix('data/cryo_exp_sig_noise1.bin', x[0])
+    datahelpers.write_gplt_binary_matrix('data/cryo_exp_sig_noise2.bin', x[1])
 
     N = x.shape[-1]
 

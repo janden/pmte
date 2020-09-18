@@ -6,6 +6,8 @@ import numpy as np
 
 from pmte import estimation, simulation, tapers, util
 
+import datahelpers
+
 
 def main():
     N = 128
@@ -41,27 +43,27 @@ def main():
     recinten = tapers.taper_intensity(rectapers, shifted=True)
 
     fname = 'data/rectap1.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, rectapers[0, :, :])
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, rectapers[0, :, :])
 
     fname = 'data/rectap2.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, rectapers[1, :, :])
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, rectapers[1, :, :])
 
     fname = 'data/rectap17.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, rectapers[16, :, :])
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, rectapers[16, :, :])
 
     fname = 'data/recinten.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, recinten)
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, recinten)
 
     recmultiestim = estimation.multitaper(signal, rectapers)
     recmultiestim = np.fft.fftshift(recmultiestim, axes=(-2, -1))
 
     fname = 'data/recmt.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, recmultiestim)
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, recmultiestim)
 
     recerror = calc_error(density, recmultiestim)
 
@@ -77,27 +79,27 @@ def main():
     teninten = tapers.taper_intensity(tentapers, shifted=True)
 
     fname = 'data/tentap1.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tentapers[0, :, :])
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, tentapers[0, :, :])
 
     fname = 'data/tentap2.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tentapers[1, :, :])
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, tentapers[1, :, :])
 
     fname = 'data/tentap17.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tentapers[16, :, :])
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, tentapers[16, :, :])
 
     fname = 'data/teninten.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, teninten)
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, teninten)
 
     tenmultiestim = estimation.multitaper(signal, tentapers)
     tenmultiestim = np.fft.fftshift(tenmultiestim, axes=(-2, -1))
 
     fname = 'data/tenmt.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, tenmultiestim)
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, tenmultiestim)
 
     tenerror = calc_error(density, tenmultiestim)
 

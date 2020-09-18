@@ -6,6 +6,8 @@ import numpy as np
 
 from pmte import estimation, simulation, tapers, util
 
+import datahelpers
+
 
 def main():
     N = 128
@@ -26,27 +28,27 @@ def main():
     x = simulation.generate_field((N, N), n,
             psd_fun=psd_fun, rng=rng)
 
-    sig = util.load_sim_images(n)
+    sig = datahelpers.load_sim_images(n)
 
     x = (x + 10 * sig).astype(sig.dtype)
 
     xi1, xi2 = util.grid((N, N))
     psd_true = psd_fun(xi1, xi2)
 
-    util.write_gplt_binary_matrix('data/cryo_sim_sig1.bin', sig[0])
-    util.write_gplt_binary_matrix('data/cryo_sim_sig2.bin', sig[1])
-    util.write_gplt_binary_matrix('data/cryo_sim_sig_noise1.bin', x[0])
-    util.write_gplt_binary_matrix('data/cryo_sim_sig_noise2.bin', x[1])
-    util.write_gplt_binary_matrix('data/cryo_sim_psd.bin',
+    datahelpers.write_gplt_binary_matrix('data/cryo_sim_sig1.bin', sig[0])
+    datahelpers.write_gplt_binary_matrix('data/cryo_sim_sig2.bin', sig[1])
+    datahelpers.write_gplt_binary_matrix('data/cryo_sim_sig_noise1.bin', x[0])
+    datahelpers.write_gplt_binary_matrix('data/cryo_sim_sig_noise2.bin', x[1])
+    datahelpers.write_gplt_binary_matrix('data/cryo_sim_psd.bin',
                                   np.fft.ifftshift(psd_true, axes=(-2, -1)))
 
     mask_r = 60 / 128
     mask = ~util.disk_mask(N, mask_r * N)
-    util.write_gplt_binary_matrix('data/cryo_sim_mask.bin', mask)
+    datahelpers.write_gplt_binary_matrix('data/cryo_sim_mask.bin', mask)
 
     corner_tapers = tapers.corner_tapers(mask, W)
     corner_mask = np.any(np.abs(corner_tapers) > 0, axis=0)
-    util.write_gplt_binary_matrix('data/cryo_sim_mask_grid.bin', corner_mask)
+    datahelpers.write_gplt_binary_matrix('data/cryo_sim_mask_grid.bin', corner_mask)
 
     def calc_mse(psd_est):
         return np.mean(np.abs(psd_est - psd_true) ** 2)

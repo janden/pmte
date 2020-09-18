@@ -6,6 +6,8 @@ import numpy as np
 
 from pmte import tapers, util
 
+import datahelpers
+
 
 def main():
     N = 128
@@ -34,7 +36,7 @@ def main():
 
     fname = 'data/rho1_single.csv'
 
-    util.ensure_dir_exists(fname)
+    datahelpers.ensure_dir_exists(fname)
 
     with open(fname, 'w') as f:
         for r, err in zip(rs, err1):

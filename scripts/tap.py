@@ -6,6 +6,8 @@ import numpy as np
 
 from pmte import estimation, simulation, tapers, util
 
+import datahelpers
+
 
 def main():
     N = 128
@@ -31,8 +33,8 @@ def main():
         return error
 
     fname = 'data/density.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, density)
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, density)
 
     signal = simulation.generate_field((N, N), 1, psd_fun=density_fun,
             rng=rng, real=False)
@@ -43,27 +45,27 @@ def main():
     inten = tapers.taper_intensity(proxy_tapers, shifted=True)
 
     fname = 'data/tap1.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, proxy_tapers[0, :, :])
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, proxy_tapers[0, :, :])
 
     fname = 'data/tap2.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, proxy_tapers[1, :, :])
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, proxy_tapers[1, :, :])
 
     fname = 'data/tap17.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, proxy_tapers[16, :, :])
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, proxy_tapers[16, :, :])
 
     fname = 'data/inten.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, inten)
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, inten)
 
     multiestim = estimation.multitaper(signal, proxy_tapers)
     multiestim = np.fft.fftshift(multiestim, axes=(-2, -1))
 
     fname = 'data/mt.bin'
-    util.ensure_dir_exists(fname)
-    util.write_gplt_binary_matrix(fname, multiestim)
+    datahelpers.ensure_dir_exists(fname)
+    datahelpers.write_gplt_binary_matrix(fname, multiestim)
 
     error = calc_error(density, multiestim)
 

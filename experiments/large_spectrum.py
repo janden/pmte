@@ -7,7 +7,6 @@ import numpy as np
 from scipy.linalg import subspace_angles
 from scipy.sparse.linalg import LinearOperator, eigs
 
-from pmte import util
 from pmte.tapers import concentration_op, proxy_tapers
 
 
@@ -161,8 +160,6 @@ def main():
     print('%-30s%.15g' % ('Estimated gap:', spectral_gap_est))
 
     fname = 'data/large_spectrum.csv'
-
-    util.ensure_dir_exists(fname)
 
     with open(fname, 'w') as f:
         for k, lam in enumerate(lams_subspace):
