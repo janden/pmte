@@ -1,5 +1,4 @@
 import numpy as np
-
 from scipy.fft import fftn
 
 import _internal
@@ -15,17 +14,16 @@ def periodogram(x, d):
     return x_per
 
 
-def multitaper(x, tapers, use_fftw=True):
+def multitaper(x, h, use_fftw=True):
     if use_fftw:
         pyfftw, use_fftw = _internal.try_import_pyfftw()
 
-    d = tapers.ndim - 1
+    d = h.ndim - 1
 
     if d > 2 and use_fftw:
         raise RuntimeError('FFTW is not supported for d > 2')
 
-    sig_sz = tapers.shape[-d:]
-    taper_len = tapers.shape[0]
+    n_tapers = h.shape[0]
 
     precision = np.real(x.ravel()[0]).dtype.itemsize
 
@@ -41,8 +39,8 @@ def multitaper(x, tapers, use_fftw=True):
             in_array = pyfftw.empty_aligned(x.shape,
                                             dtype=real_dtype)
             out_array = pyfftw.empty_aligned(x.shape[:-1]
-                                            + (x.shape[-1] // 2 + 1,),
-                                            dtype=complex_dtype)
+                                             + (x.shape[-1] // 2 + 1,),
+                                             dtype=complex_dtype)
         else:
             in_array = pyfftw.empty_aligned(x.shape,
                                             dtype=complex_dtype)
@@ -56,8 +54,8 @@ def multitaper(x, tapers, use_fftw=True):
                            flags=('FFTW_MEASURE',),
                            threads=n_threads)
 
-        for taper in tapers:
-            np.multiply(x, taper, out=in_array)
+        for h1 in h:
+            np.multiply(x, h1, out=in_array)
 
             plan()
 
@@ -72,8 +70,9 @@ def multitaper(x, tapers, use_fftw=True):
             x_mt_flip = x_mt[..., -2:0:-1].copy()
 
             # Don't want to flip the first (i.e., Nyquist) frequency.
-            ixgrid = np.ix_(*(range(sz) for sz in x_mt_flip.shape[:-d]), *(range(1,
-                sz) for sz in x_mt_flip.shape[-d:-1]), range(x_mt_flip.shape[-1]))
+            ixgrid = np.ix_(*(range(sz) for sz in x_mt_flip.shape[:-d]),
+                            *(range(1, sz) for sz in x_mt_flip.shape[-d:-1]),
+                            range(x_mt_flip.shape[-1]))
 
             x_mt_flip[ixgrid] = np.flip(x_mt_flip[ixgrid], axis=range(-d, -1))
 
@@ -82,13 +81,14 @@ def multitaper(x, tapers, use_fftw=True):
         x_mt = np.zeros_like(x, dtype=real_dtype)
         x_tapered = np.empty_like(x)
 
-        for taper in tapers:
-            np.multiply(x, taper, out=x_tapered)
+        for h1 in h:
+            np.multiply(x, h1, out=x_tapered)
 
             x_tapered_f = fftn(x_tapered, axes=range(-d, 0), workers=-1)
 
-            np.add(x_mt, x_tapered_f.real ** 2 + x_tapered_f.imag ** 2, out=x_mt)
+            np.add(x_mt, x_tapered_f.real ** 2
+                   + x_tapered_f.imag ** 2, out=x_mt)
 
-    x_mt /= taper_len
+    x_mt /= n_tapers
 
     return x_mt
