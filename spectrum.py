@@ -1,7 +1,7 @@
 import numpy as np
 
-from tapers import concentration_op
 import util
+from tapers import concentration_op
 
 
 def main():

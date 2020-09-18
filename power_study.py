@@ -1,10 +1,9 @@
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 from scipy.linalg import subspace_angles
+from scipy.signal.windows import dpss
 
 from tapers import concentration_op
-from scipy.signal.windows import dpss
 
 
 def gaussian_prob(n):

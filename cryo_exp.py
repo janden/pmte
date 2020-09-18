@@ -1,9 +1,10 @@
-import numpy as np
 import json
 
-import util
+import numpy as np
+
 import estimation
 import tapers
+import util
 
 
 def main():

@@ -1,11 +1,12 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.sparse.linalg import LinearOperator, eigs
 from time import time
-from scipy.linalg import subspace_angles
 
-from tapers import concentration_op, proxy_tapers
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.linalg import subspace_angles
+from scipy.sparse.linalg import LinearOperator, eigs
+
 import util
+from tapers import concentration_op, proxy_tapers
 
 
 def main():

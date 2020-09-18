@@ -1,8 +1,7 @@
 import numpy as np
-
-from scipy.signal.windows import dpss
-from scipy.linalg import qr
 from scipy.fft import fftn, ifftn
+from scipy.linalg import qr
+from scipy.signal.windows import dpss
 
 import _internal
 

@@ -1,10 +1,8 @@
-import os
 import gzip
+import os
 
 import numpy as np
-
 from scipy.linalg import subspace_angles
-
 from scipy.ndimage import rotate
 
 
