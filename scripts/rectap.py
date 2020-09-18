@@ -1,7 +1,5 @@
 import _preamble
 
-import json
-
 import numpy as np
 
 from pmte import estimation, simulation, tapers, util
@@ -93,9 +91,7 @@ def main():
                'deviation': float(deviation),
                'deviation_conv': float(deviation_conv)}
 
-    with open('data/rectap.json', 'w') as f:
-        json.dump(results, f)
-        f.write('\n')
+    datahelpers.save_json('rectap', results)
 
 
 if __name__ == '__main__':

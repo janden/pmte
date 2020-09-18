@@ -1,7 +1,5 @@
 import _preamble
 
-import json
-
 import numpy as np
 
 from pmte import estimation, simulation, tapers, util
@@ -57,9 +55,7 @@ def main():
 
     results = {'error': float(error)}
 
-    with open('data/tap.json', 'w') as f:
-        json.dump(results, f)
-        f.write('\n')
+    datahelpers.save_json('tap', results)
 
 if __name__ == '__main__':
     main()

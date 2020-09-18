@@ -1,7 +1,5 @@
 import _preamble
 
-import json
-
 import numpy as np
 
 from pmte import tapers, util
@@ -46,9 +44,7 @@ def main():
 
     results = {'beta': float(beta)}
 
-    with open('data/rho1_single.json', 'w') as f:
-        json.dump(results, f)
-        f.write('\n')
+    datahelpers.save_json('rho1_single', results)
 
 
 if __name__ == '__main__':

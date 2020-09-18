@@ -1,7 +1,5 @@
 import _preamble
 
-import json
-
 import numpy as np
 
 from pmte import estimation, tapers, util
@@ -92,9 +90,7 @@ def main():
                'mse_factor_mper': float(mse_factor_mper),
                'mse_factor_cmt': float(mse_factor_cmt)}
 
-    with open('data/cryo_exp.json', 'w') as f:
-        json.dump(results, f)
-        f.write('\n')
+    datahelpers.save_json('cryo_exp', results)
 
 if __name__ == '__main__':
     main()

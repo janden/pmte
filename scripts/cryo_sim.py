@@ -1,7 +1,5 @@
 import _preamble
 
-import json
-
 import numpy as np
 
 from pmte import estimation, simulation, tapers, util
@@ -135,9 +133,7 @@ def main():
                'variance_factor_mper': float(variance_factor_mper),
                'variance_factor_cmt': float(variance_factor_cmt)}
 
-    with open('data/cryo_sim.json', 'w') as f:
-        json.dump(results, f)
-        f.write('\n')
+    datahelpers.save_json('cryo_sim', results)
 
 
 if __name__ == '__main__':

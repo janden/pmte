@@ -1,7 +1,5 @@
 import _preamble
 
-import json
-
 import numpy as np
 from scipy.integrate import fixed_quad
 from scipy.special import jv
@@ -69,9 +67,7 @@ def main():
 
     results = {'beta': float(beta)}
 
-    with open('data/mse2_single.json', 'w') as f:
-        json.dump(results, f)
-        f.write('\n')
+    datahelpers.save_json('mse2_single', results)
 
 
 if __name__ == '__main__':
