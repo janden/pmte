@@ -115,7 +115,7 @@ def save_table(name, *args):
             f.write(line + '\n')
 
 
-def save_json(name, values):
+def save_dictionary(name, values):
     filename = os.path.join(_root_dir(), 'data', name + '.json')
 
     ensure_dir_exists(filename)

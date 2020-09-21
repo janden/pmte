@@ -88,7 +88,7 @@ def main():
                'mse_factor_mper': float(mse_factor_mper),
                'mse_factor_cmt': float(mse_factor_cmt)}
 
-    datahelpers.save_json('cryo_exp', results)
+    datahelpers.save_dictionary('cryo_exp', results)
 
 if __name__ == '__main__':
     main()

@@ -55,7 +55,7 @@ def main():
 
     results = {'error': float(error)}
 
-    datahelpers.save_json('tap', results)
+    datahelpers.save_dictionary('tap', results)
 
 if __name__ == '__main__':
     main()

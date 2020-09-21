@@ -91,7 +91,7 @@ def main():
                'deviation': float(deviation),
                'deviation_conv': float(deviation_conv)}
 
-    datahelpers.save_json('rectap', results)
+    datahelpers.save_dictionary('rectap', results)
 
 
 if __name__ == '__main__':

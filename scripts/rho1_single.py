@@ -38,7 +38,7 @@ def main():
 
     results = {'beta': float(beta)}
 
-    datahelpers.save_json('rho1_single', results)
+    datahelpers.save_dictionary('rho1_single', results)
 
 
 if __name__ == '__main__':

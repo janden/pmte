@@ -61,7 +61,7 @@ def main():
 
     results = {'beta': float(beta)}
 
-    datahelpers.save_json('mse2_single', results)
+    datahelpers.save_dictionary('mse2_single', results)
 
 
 if __name__ == '__main__':

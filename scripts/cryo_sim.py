@@ -129,7 +129,7 @@ def main():
                'variance_factor_mper': float(variance_factor_mper),
                'variance_factor_cmt': float(variance_factor_cmt)}
 
-    datahelpers.save_json('cryo_sim', results)
+    datahelpers.save_dictionary('cryo_sim', results)
 
 
 if __name__ == '__main__':
