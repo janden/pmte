@@ -145,11 +145,12 @@ def tensor_tapers(sig_shape, W=1 / 4):
 
         # Move first and second axes into ellth and (d + ell)th,
         # respectively.
-        new_axes = (tuple(range(0, ell))
-                    + tuple(range(ell + 1, d))
-                    + tuple(range(d, d + ell))
-                    + tuple(range(d + ell + 1, 2 * d)))
-        h_ell = np.expand_dims(h_ell, new_axes)
+        h_ell = np.reshape(h_ell, (1,) * ell
+                           + (K[ell],)
+                           + (1,) * (d - ell - 1)
+                           + (1,) * ell
+                           + (sig_shape[ell],)
+                           + (1, ) * (d - ell - 1))
 
         h = h * h_ell
 
