@@ -10,6 +10,8 @@ def main():
     fname1 = args[0]
     fname2 = args[1]
 
+    relative = ('--relative' in args[2:])
+
     try:
         with open(fname1, 'r') as f:
             X1 = json.load(f)
@@ -19,7 +21,13 @@ def main():
         print('not found')
         return
 
-    n = np.linalg.norm([np.linalg.norm(X1[k] - X2[k]) for k in X1.keys()])
+    def norm(X):
+        return np.linalg.norm([np.linalg.norm(X[k]) for k in X.keys()])
+
+    n = norm({k: X1[k] - X2[k] for k in X1.keys()})
+
+    if relative:
+        n /= norm(X2)
 
     print(n)
 
