@@ -4,7 +4,7 @@ import numpy as np
 
 from pmte import estimation, tapers, util
 
-import datahelpers
+import helpers
 
 
 def main():
@@ -16,10 +16,10 @@ def main():
 
     do_print = True
 
-    x, proj = datahelpers.load_exp_images(n)
+    x, proj = helpers.load_exp_images(n)
 
-    datahelpers.save_image('cryo_exp_sig_noise1', x[0])
-    datahelpers.save_image('cryo_exp_sig_noise2', x[1])
+    helpers.save_image('cryo_exp_sig_noise1', x[0])
+    helpers.save_image('cryo_exp_sig_noise2', x[1])
 
     N = x.shape[-1]
 
@@ -69,7 +69,7 @@ def main():
 
             mses[name].append(mse)
 
-    datahelpers.save_table('cryo_exp', np.round(N * mask_rs), mses['mper'],
+    helpers.save_table('cryo_exp', np.round(N * mask_rs), mses['mper'],
                            mses['cmt'], mses['pmt'])
 
     min_mse_mper = np.min(mses['mper'])
@@ -88,7 +88,7 @@ def main():
                'mse_factor_mper': float(mse_factor_mper),
                'mse_factor_cmt': float(mse_factor_cmt)}
 
-    datahelpers.save_dictionary('cryo_exp', results)
+    helpers.save_dictionary('cryo_exp', results)
 
 if __name__ == '__main__':
     main()

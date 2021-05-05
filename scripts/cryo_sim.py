@@ -4,7 +4,7 @@ import numpy as np
 
 from pmte import estimation, simulation, tapers, util
 
-import datahelpers
+import helpers
 
 
 def main():
@@ -26,27 +26,27 @@ def main():
     x = simulation.generate_field((N, N), n,
             psd_fun=psd_fun, rng=rng)
 
-    sig = datahelpers.load_sim_images(n)
+    sig = helpers.load_sim_images(n)
 
     x = (x + 10 * sig).astype(sig.dtype)
 
     xi1, xi2 = util.grid((N, N))
     psd_true = psd_fun(xi1, xi2)
 
-    datahelpers.save_image('cryo_sim_sig1', sig[0])
-    datahelpers.save_image('cryo_sim_sig2', sig[1])
-    datahelpers.save_image('cryo_sim_sig_noise1', x[0])
-    datahelpers.save_image('cryo_sim_sig_noise2', x[1])
-    datahelpers.save_image('cryo_sim_psd',
+    helpers.save_image('cryo_sim_sig1', sig[0])
+    helpers.save_image('cryo_sim_sig2', sig[1])
+    helpers.save_image('cryo_sim_sig_noise1', x[0])
+    helpers.save_image('cryo_sim_sig_noise2', x[1])
+    helpers.save_image('cryo_sim_psd',
                            np.fft.ifftshift(psd_true, axes=(-2, -1)))
 
     mask_r = 60 / 128
     mask = ~util.disk_mask(N, mask_r * N)
-    datahelpers.save_image('cryo_sim_mask', mask)
+    helpers.save_image('cryo_sim_mask', mask)
 
     corner_tapers = tapers.corner_tapers(mask, W)
     corner_mask = np.any(np.abs(corner_tapers) > 0, axis=0)
-    datahelpers.save_image('cryo_sim_mask_grid', corner_mask)
+    helpers.save_image('cryo_sim_mask_grid', corner_mask)
 
     def calc_mse(psd_est):
         return np.mean(np.abs(psd_est - psd_true) ** 2)
@@ -98,14 +98,14 @@ def main():
             biases[name].append(bias)
             variances[name].append(variance)
 
-    datahelpers.save_table('cryo_sim_biases', np.round(N * mask_rs),
+    helpers.save_table('cryo_sim_biases', np.round(N * mask_rs),
                            biases['mper'], biases['cmt'], biases['pmt'])
 
-    datahelpers.save_table('cryo_sim_variances', np.round(N * mask_rs),
+    helpers.save_table('cryo_sim_variances', np.round(N * mask_rs),
                            variances['mper'], variances['cmt'],
                            variances['pmt'])
 
-    datahelpers.save_table('cryo_sim_mses', np.round(N * mask_rs),
+    helpers.save_table('cryo_sim_mses', np.round(N * mask_rs),
                            mses['mper'], mses['cmt'],
                            mses['pmt'])
 
@@ -129,7 +129,7 @@ def main():
                'variance_factor_mper': float(variance_factor_mper),
                'variance_factor_cmt': float(variance_factor_cmt)}
 
-    datahelpers.save_dictionary('cryo_sim', results)
+    helpers.save_dictionary('cryo_sim', results)
 
 
 if __name__ == '__main__':

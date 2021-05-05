@@ -4,7 +4,7 @@ import numpy as np
 
 from pmte import estimation, simulation, tapers, util
 
-import datahelpers
+import helpers
 
 
 def main():
@@ -30,7 +30,7 @@ def main():
 
         return error
 
-    datahelpers.save_image('density', density)
+    helpers.save_image('density', density)
 
     signal = simulation.generate_field((N, N), 1, psd_fun=density_fun,
             rng=rng, real=False)
@@ -40,22 +40,22 @@ def main():
 
     inten = tapers.taper_intensity(proxy_tapers, shifted=True)
 
-    datahelpers.save_image('tap1', proxy_tapers[0])
-    datahelpers.save_image('tap2', proxy_tapers[1])
-    datahelpers.save_image('tap17', proxy_tapers[16])
+    helpers.save_image('tap1', proxy_tapers[0])
+    helpers.save_image('tap2', proxy_tapers[1])
+    helpers.save_image('tap17', proxy_tapers[16])
 
-    datahelpers.save_image('inten', inten)
+    helpers.save_image('inten', inten)
 
     multiestim = estimation.multitaper(signal, proxy_tapers)
     multiestim = np.fft.fftshift(multiestim, axes=(-2, -1))
 
-    datahelpers.save_image('mt', multiestim)
+    helpers.save_image('mt', multiestim)
 
     error = calc_error(density, multiestim)
 
     results = {'error': float(error)}
 
-    datahelpers.save_dictionary('tap', results)
+    helpers.save_dictionary('tap', results)
 
 if __name__ == '__main__':
     main()

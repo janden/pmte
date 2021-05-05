@@ -4,7 +4,7 @@ import numpy as np
 
 from pmte import util
 
-import datahelpers
+import helpers
 
 
 def main():
@@ -14,15 +14,15 @@ def main():
 
     mask1 = util.target_win(N, W, shifted=True)
 
-    datahelpers.save_image('mask1', mask1)
+    helpers.save_image('mask1', mask1)
 
     mask2 = ~util.disk_mask(N, R)
 
-    datahelpers.save_image('mask2', mask2)
+    helpers.save_image('mask2', mask2)
 
     recmask2 = util.square_mask(N, R)
 
-    datahelpers.save_image('recmask2', recmask2)
+    helpers.save_image('recmask2', recmask2)
 
 if __name__ == '__main__':
     main()

@@ -6,7 +6,7 @@ from scipy.special import jv
 
 from pmte import estimation, simulation, tapers, util
 
-import datahelpers
+import helpers
 
 
 def main():
@@ -55,13 +55,13 @@ def main():
     err2 = np.array(err2)
     caro2 = np.array(caro2)
 
-    datahelpers.save_table('mse2_single', rs * N, err2)
+    helpers.save_table('mse2_single', rs * N, err2)
 
     beta = util.log_slope(rs * N, err2 / np.log(caro2) ** 2)
 
     results = {'beta': float(beta)}
 
-    datahelpers.save_dictionary('mse2_single', results)
+    helpers.save_dictionary('mse2_single', results)
 
 
 if __name__ == '__main__':

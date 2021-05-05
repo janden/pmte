@@ -4,7 +4,7 @@ import numpy as np
 
 from pmte import estimation, simulation, tapers, util
 
-import datahelpers
+import helpers
 
 
 def main():
@@ -40,16 +40,16 @@ def main():
 
     recinten = tapers.taper_intensity(rectapers, shifted=True)
 
-    datahelpers.save_image('rectap1', rectapers[0])
-    datahelpers.save_image('rectap2', rectapers[1])
-    datahelpers.save_image('rectap17', rectapers[16])
+    helpers.save_image('rectap1', rectapers[0])
+    helpers.save_image('rectap2', rectapers[1])
+    helpers.save_image('rectap17', rectapers[16])
 
-    datahelpers.save_image('recinten', recinten)
+    helpers.save_image('recinten', recinten)
 
     recmultiestim = estimation.multitaper(signal, rectapers)
     recmultiestim = np.fft.fftshift(recmultiestim, axes=(-2, -1))
 
-    datahelpers.save_image('recmt', recmultiestim)
+    helpers.save_image('recmt', recmultiestim)
 
     recerror = calc_error(density, recmultiestim)
 
@@ -64,16 +64,16 @@ def main():
 
     teninten = tapers.taper_intensity(tentapers, shifted=True)
 
-    datahelpers.save_image('tentap1', tentapers[0])
-    datahelpers.save_image('tentap2', tentapers[1])
-    datahelpers.save_image('tentap17', tentapers[16])
+    helpers.save_image('tentap1', tentapers[0])
+    helpers.save_image('tentap2', tentapers[1])
+    helpers.save_image('tentap17', tentapers[16])
 
-    datahelpers.save_image('teninten', teninten)
+    helpers.save_image('teninten', teninten)
 
     tenmultiestim = estimation.multitaper(signal, tentapers)
     tenmultiestim = np.fft.fftshift(tenmultiestim, axes=(-2, -1))
 
-    datahelpers.save_image('tenmt', tenmultiestim)
+    helpers.save_image('tenmt', tenmultiestim)
 
     tenerror = calc_error(density, tenmultiestim)
 
@@ -91,7 +91,7 @@ def main():
                'deviation': float(deviation),
                'deviation_conv': float(deviation_conv)}
 
-    datahelpers.save_dictionary('rectap', results)
+    helpers.save_dictionary('rectap', results)
 
 
 if __name__ == '__main__':

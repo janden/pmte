@@ -4,7 +4,7 @@ import numpy as np
 
 from pmte import tapers, util
 
-import datahelpers
+import helpers
 
 
 def main():
@@ -32,13 +32,13 @@ def main():
 
     err1 = np.array(err1)
 
-    datahelpers.save_table('rho1_single', rs * N, err1)
+    helpers.save_table('rho1_single', rs * N, err1)
 
     beta = util.log_slope(rs * N, err1)
 
     results = {'beta': float(beta)}
 
-    datahelpers.save_dictionary('rho1_single', results)
+    helpers.save_dictionary('rho1_single', results)
 
 
 if __name__ == '__main__':

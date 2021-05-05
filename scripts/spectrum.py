@@ -4,7 +4,7 @@ import numpy as np
 
 from pmte.tapers import concentration_op
 
-import datahelpers
+import helpers
 
 
 def main():
@@ -22,7 +22,7 @@ def main():
 
     idx = np.arange(1, len(D) + 1)
 
-    datahelpers.save_table('spectrum', idx, D)
+    helpers.save_table('spectrum', idx, D)
 
 
 if __name__ == '__main__':

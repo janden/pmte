@@ -2,7 +2,7 @@ import sys
 
 import numpy as np
 
-import datahelpers
+import helpers
 
 
 def main():
@@ -14,8 +14,8 @@ def main():
     relative = ('--relative' in args[2:])
 
     try:
-        X1 = datahelpers.load_float32(fname1)
-        X2 = datahelpers.load_float32(fname2)
+        X1 = helpers.load_float32(fname1)
+        X2 = helpers.load_float32(fname2)
     except FileNotFoundError:
         print('not found')
         return

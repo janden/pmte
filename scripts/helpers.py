@@ -5,6 +5,8 @@ import json
 
 from scipy.ndimage import rotate
 
+import matplotlib.pyplot as plt
+
 
 def _root_dir():
     dirname = os.path.dirname(os.path.abspath(__file__))
@@ -123,3 +125,22 @@ def save_dictionary(name, values):
     with open(filename, 'w') as f:
         json.dump(values, f)
         f.write('\n')
+
+
+def plot_grayscale_image(im, diverging=True, axis='q', reverse=True):
+    if diverging:
+        mx = np.max(np.abs(im))
+        mn = -mx
+    else:
+        mn, mx = np.min(im), np.max(im)
+
+    cmap = 'gray'
+
+    if reverse:
+        cmap += '_r'
+
+    plt.imshow(im, cmap=cmap, vmin=mn, vmax=mx)
+    plt.xticks([])
+    plt.yticks([])
+    plt.xlabel('$%s_1$' % (axis,))
+    plt.ylabel('$%s_2$' % (axis,))
