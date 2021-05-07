@@ -236,7 +236,7 @@ def proxy_tapers(mask, W=1 / 4, n_iter=8, K=None, rng=None, use_fftw=True):
     return V
 
 
-def taper_intensity(tapers, grid_sz=None, shifted=False):
+def spectral_window(tapers, grid_sz=None, shifted=False):
     d = tapers.ndim - 1
 
     if grid_sz is None:
