@@ -4,7 +4,7 @@ from pmte import util
 
 
 def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, rng=None,
-                   real=True):
+                   real=True, dtype=None):
     if psd_fun is None:
         def psd_fun(x, y):
             return np.ones_like(x)
@@ -30,10 +30,11 @@ def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, rng=None,
 
     filter_f = np.sqrt(np.maximum(0, density))
 
-    if real:
-        dtype = 'float64'
-    else:
-        dtype = 'complex128'
+    if dtype is None:
+        if real:
+            dtype = 'float64'
+        else:
+            dtype = 'complex128'
 
     x = np.zeros((n,) + sig_sz, dtype=dtype)
 
@@ -45,10 +46,10 @@ def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, rng=None,
         gen_block_sz = (n_block,) + gen_sig_sz
 
         if real:
-            w = gen_fun(gen_block_sz)
+            w = gen_fun(gen_block_sz, dtype)
         else:
-            w = 1 / np.sqrt(2) * (gen_fun(gen_block_sz)
-                                  + 1J * gen_fun(gen_block_sz))
+            w = 1 / np.sqrt(2) * (gen_fun(gen_block_sz, dtype)
+                                  + 1J * gen_fun(gen_block_sz, dtype))
 
         wf = np.fft.fftn(w, axes=range(-d, 0))
         xf_block = wf * filter_f
