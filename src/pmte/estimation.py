@@ -4,17 +4,20 @@ from scipy.fft import fftn
 from pmte import _internal
 
 
-def periodogram(x, d):
+def periodogram(x, d, shifted=False):
     sig_sz = x.shape[-d:]
 
     xf = fftn(x, axes=range(-d, 0), workers=-1)
 
     x_per = 1 / np.prod(sig_sz) * (xf.real ** 2 + xf.imag ** 2)
 
+    if shifted:
+        x_per = np.fft.fftshift(x_per, axes=range(-d, 0))
+
     return x_per
 
 
-def multitaper(x, h, use_fftw=True):
+def multitaper(x, h, use_fftw=True, shifted=False):
     if use_fftw:
         pyfftw, use_fftw = _internal.try_import_pyfftw()
 
@@ -90,5 +93,8 @@ def multitaper(x, h, use_fftw=True):
                    + x_tapered_f.imag ** 2, out=x_mt)
 
     x_mt /= n_tapers
+
+    if shifted:
+        x_mt = np.fft.fftshift(x_mt, axes=range(-d, 0))
 
     return x_mt
