@@ -34,7 +34,7 @@ def grid(sz, normalized=True, shifted=False):
     return grid
 
 
-def target_win(Nf, W, shifted=False):
+def target_spectral_window(Nf, W, shifted=False):
     fX, fY = grid((Nf, Nf), shifted=shifted)
 
     rho = np.zeros((Nf, Nf))
