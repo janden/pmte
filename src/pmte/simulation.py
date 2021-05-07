@@ -4,7 +4,7 @@ from pmte import util
 
 
 def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, rng=None,
-                   real=True, dtype=None):
+                   real=True, dtype='float64'):
     if psd_fun is None:
         def psd_fun(x, y):
             return np.ones_like(x)
@@ -14,6 +14,10 @@ def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, rng=None,
 
     if rng is None:
         rng = np.random.default_rng()
+
+    dtype = np.dtype(dtype)
+    if not dtype in [np.dtype('float32'), np.dtype('float64')]:
+        raise ValueError('Invalid dtype. Must be `float32` or `float64`.')
 
     gen_fun = rng.standard_normal
 
@@ -30,13 +34,14 @@ def generate_field(sig_sz, n, psd_fun=None, gen_sig_sz=None, rng=None,
 
     filter_f = np.sqrt(np.maximum(0, density))
 
-    if dtype is None:
-        if real:
-            dtype = 'float64'
-        else:
-            dtype = 'complex128'
+    if real:
+        complex_dtype = dtype
+    elif dtype == np.dtype('float32'):
+        complex_dtype = 'complex64'
+    elif dtype == np.dtype('float64'):
+        complex_dtype = 'complex128'
 
-    x = np.zeros((n,) + sig_sz, dtype=dtype)
+    x = np.zeros((n,) + sig_sz, dtype=complex_dtype)
 
     block_count = int(np.ceil(n / block_size))
 
