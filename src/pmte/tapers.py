@@ -34,7 +34,9 @@ def concentration_op(mask, W=1 / 4, use_fftw=True):
     fft_sig_sz = two_sig_sz
 
     if use_fftw:
-        in_array = pyfftw.empty_aligned((block_size,) + fft_sig_sz, dtype="float64")
+        in_array = pyfftw.empty_aligned(
+            (block_size,) + fft_sig_sz, dtype="float64"
+        )
         out_array = pyfftw.empty_aligned(
             (block_size,) + fft_sig_sz[:-1] + (fft_sig_sz[-1] // 2 + 1,),
             dtype="complex128",
@@ -187,7 +189,10 @@ def corner_tapers(mask, W=1 / 4):
     tapers4 = tensor_tapers((N4,) * 2, W=W)
 
     taper_len = (
-        tapers1.shape[0] + tapers2.shape[0] + tapers3.shape[0] + tapers4.shape[0]
+        tapers1.shape[0]
+        + tapers2.shape[0]
+        + tapers3.shape[0]
+        + tapers4.shape[0]
     )
 
     tapers = np.zeros((taper_len,) + mask.shape, dtype=tapers1.dtype)

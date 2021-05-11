@@ -92,7 +92,9 @@ def multitaper(x, h, use_fftw=True, shifted=False):
 
             x_tapered_f = fftn(x_tapered, axes=range(-d, 0), workers=-1)
 
-            np.add(x_mt, x_tapered_f.real ** 2 + x_tapered_f.imag ** 2, out=x_mt)
+            np.add(
+                x_mt, x_tapered_f.real ** 2 + x_tapered_f.imag ** 2, out=x_mt
+            )
 
     x_mt /= n_tapers
 
