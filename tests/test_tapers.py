@@ -40,6 +40,9 @@ def test_concentation_op_sinc_1d(N, W, use_fftw):
 
     assert np.allclose(A, A_true)
 
+    # Test singleton apply.
+    assert np.allclose(op(np.eye(N)[:, 0]), A_true[:, 0])
+
 
 @pytest.mark.parametrize("N, M", [(4, 4), (4, 5)])
 @pytest.mark.parametrize("W", [(1 / 2, 1 / 2), (1 / 2, 1 / 3), (1 / 3, 1 / 3)])
@@ -60,3 +63,6 @@ def test_concentation_op_sinc_2d(N, M, W, use_fftw):
     A_true = np.kron(A1_true, A2_true)
 
     assert np.allclose(A, A_true)
+
+    # Test singleton apply.
+    assert np.allclose(op(np.eye(N * M)[:, 0]), A_true[:, 0])
