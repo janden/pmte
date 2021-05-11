@@ -156,6 +156,8 @@ def tensor_tapers(sig_shape, W=1 / 4):
             # periodogram).
             h_ell = 1 / np.sqrt(sig_shape[ell]) * np.ones((1, sig_shape[ell]))
 
+            K[ell] = 1
+
         # Move first and second axes into ellth and (d + ell)th,
         # respectively.
         h_ell = np.reshape(
