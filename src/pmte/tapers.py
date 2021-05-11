@@ -145,9 +145,12 @@ def tensor_tapers(sig_shape, W=1 / 4):
 
     for ell in range(d):
         if K[ell] > 0:
-            h_ell = dpss(
-                sig_shape[ell], sig_shape[ell] * W[ell] / 2, Kmax=K[ell], norm=2
-            )
+            if W[ell] == 1:
+                h_ell = np.eye(sig_shape[ell])
+            else:
+                h_ell = dpss(
+                    sig_shape[ell], sig_shape[ell] * W[ell] / 2, Kmax=K[ell], norm=2
+                )
         else:
             # If K is too small, just use constant taper (so we get the
             # periodogram).
@@ -279,8 +282,8 @@ def _ensure_W(W, d):
     elif W.shape[0] != d:
         raise TypeError("Bandwidth W must have 1 or d elements.")
 
-    if any(W >= 1):
-        raise ValueError("Bandwidth W must be strictly smaller than 1.")
+    if any(W > 1):
+        raise ValueError("Bandwidth W must be smaller than or equal to 1.")
 
     return W
 
