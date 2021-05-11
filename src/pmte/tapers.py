@@ -184,7 +184,7 @@ def corner_tapers(mask, W=1 / 4):
     d = mask.ndim
 
     if not d == 2:
-        raise RuntimeError("Only implemented for 2D signals.")
+        raise TypeError("Only implemented for 2D signals.")
 
     N1, N2, N3, N4 = _fit_corner_mask(mask)
 
