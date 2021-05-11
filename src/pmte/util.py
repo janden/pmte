@@ -15,6 +15,6 @@ def grid(sz, normalized=True, shifted=False):
     if not shifted:
         rngs = [np.fft.ifftshift(rng) for rng in rngs]
 
-    grid = np.meshgrid(*rngs, indexing='ij')
+    grid = np.meshgrid(*rngs, indexing="ij")
 
     return grid

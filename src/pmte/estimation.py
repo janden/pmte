@@ -24,38 +24,39 @@ def multitaper(x, h, use_fftw=True, shifted=False):
     d = h.ndim - 1
 
     if d > 2 and use_fftw:
-        raise RuntimeError('FFTW is not supported for d > 2')
+        raise RuntimeError("FFTW is not supported for d > 2")
 
     n_tapers = h.shape[0]
 
     precision = np.real(x.ravel()[0]).dtype.itemsize
 
-    real_dtype = {4: 'float32', 8: 'float64'}[precision]
-    complex_dtype = {4: 'complex64', 8: 'complex128'}[precision]
+    real_dtype = {4: "float32", 8: "float64"}[precision]
+    complex_dtype = {4: "complex64", 8: "complex128"}[precision]
 
-    is_real = (np.real(x.ravel()[0]).dtype == x.dtype)
+    is_real = np.real(x.ravel()[0]).dtype == x.dtype
 
     if use_fftw:
         n_threads = 8
 
         if is_real:
-            in_array = pyfftw.empty_aligned(x.shape,
-                                            dtype=real_dtype)
-            out_array = pyfftw.empty_aligned(x.shape[:-1]
-                                             + (x.shape[-1] // 2 + 1,),
-                                             dtype=complex_dtype)
+            in_array = pyfftw.empty_aligned(x.shape, dtype=real_dtype)
+            out_array = pyfftw.empty_aligned(
+                x.shape[:-1] + (x.shape[-1] // 2 + 1,), dtype=complex_dtype
+            )
         else:
-            in_array = pyfftw.empty_aligned(x.shape,
-                                            dtype=complex_dtype)
-            out_array = pyfftw.empty_aligned(x.shape,
-                                             dtype=complex_dtype)
+            in_array = pyfftw.empty_aligned(x.shape, dtype=complex_dtype)
+            out_array = pyfftw.empty_aligned(x.shape, dtype=complex_dtype)
 
         x_mt = np.zeros(out_array.shape, dtype=real_dtype)
 
-        plan = pyfftw.FFTW(in_array, out_array, axes=range(-d, 0),
-                           direction='FFTW_FORWARD',
-                           flags=('FFTW_MEASURE',),
-                           threads=n_threads)
+        plan = pyfftw.FFTW(
+            in_array,
+            out_array,
+            axes=range(-d, 0),
+            direction="FFTW_FORWARD",
+            flags=("FFTW_MEASURE",),
+            threads=n_threads,
+        )
 
         for h1 in h:
             np.multiply(x, h1, out=in_array)
@@ -73,9 +74,11 @@ def multitaper(x, h, use_fftw=True, shifted=False):
             x_mt_flip = x_mt[..., -2:0:-1].copy()
 
             # Don't want to flip the first (i.e., Nyquist) frequency.
-            ixgrid = np.ix_(*(range(sz) for sz in x_mt_flip.shape[:-d]),
-                            *(range(1, sz) for sz in x_mt_flip.shape[-d:-1]),
-                            range(x_mt_flip.shape[-1]))
+            ixgrid = np.ix_(
+                *(range(sz) for sz in x_mt_flip.shape[:-d]),
+                *(range(1, sz) for sz in x_mt_flip.shape[-d:-1]),
+                range(x_mt_flip.shape[-1])
+            )
 
             x_mt_flip[ixgrid] = np.flip(x_mt_flip[ixgrid], axis=range(-d, -1))
 
@@ -89,8 +92,7 @@ def multitaper(x, h, use_fftw=True, shifted=False):
 
             x_tapered_f = fftn(x_tapered, axes=range(-d, 0), workers=-1)
 
-            np.add(x_mt, x_tapered_f.real ** 2
-                   + x_tapered_f.imag ** 2, out=x_mt)
+            np.add(x_mt, x_tapered_f.real ** 2 + x_tapered_f.imag ** 2, out=x_mt)
 
     x_mt /= n_tapers
 

@@ -23,7 +23,7 @@ def concentration_op(mask, W=1 / 4, use_fftw=True):
     two_sig_sz = tuple(2 * sz for sz in sig_sz)
 
     rngs = [sz * np.fft.fftfreq(sz) for sz in two_sig_sz]
-    grids = np.meshgrid(*rngs, indexing='ij')
+    grids = np.meshgrid(*rngs, indexing="ij")
 
     sinc_kernel = np.ones(two_sig_sz)
 
@@ -35,23 +35,31 @@ def concentration_op(mask, W=1 / 4, use_fftw=True):
     fft_sig_sz = two_sig_sz
 
     if use_fftw:
-        in_array = pyfftw.empty_aligned((block_size,) + fft_sig_sz,
-                                        dtype='float64')
-        out_array = pyfftw.empty_aligned((block_size,) + fft_sig_sz[:-1]
-                                         + (fft_sig_sz[-1] // 2 + 1,),
-                                         dtype='complex128')
+        in_array = pyfftw.empty_aligned((block_size,) + fft_sig_sz, dtype="float64")
+        out_array = pyfftw.empty_aligned(
+            (block_size,) + fft_sig_sz[:-1] + (fft_sig_sz[-1] // 2 + 1,),
+            dtype="complex128",
+        )
 
-        plan_forward = pyfftw.FFTW(in_array, out_array, axes=range(-d, 0),
-                                   direction='FFTW_FORWARD',
-                                   flags=('FFTW_MEASURE',),
-                                   threads=n_threads)
+        plan_forward = pyfftw.FFTW(
+            in_array,
+            out_array,
+            axes=range(-d, 0),
+            direction="FFTW_FORWARD",
+            flags=("FFTW_MEASURE",),
+            threads=n_threads,
+        )
 
-        plan_backward = pyfftw.FFTW(out_array, in_array, axes=range(-d, 0),
-                                    direction='FFTW_BACKWARD',
-                                    flags=('FFTW_MEASURE',),
-                                    threads=n_threads)
+        plan_backward = pyfftw.FFTW(
+            out_array,
+            in_array,
+            axes=range(-d, 0),
+            direction="FFTW_BACKWARD",
+            flags=("FFTW_MEASURE",),
+            threads=n_threads,
+        )
 
-        freq_mask = freq_mask[..., :out_array.shape[-1]]
+        freq_mask = freq_mask[..., : out_array.shape[-1]]
 
     def _apply(x):
         x = np.reshape(x, x.shape[:1] + sig_sz)
@@ -107,7 +115,7 @@ def concentration_op(mask, W=1 / 4, use_fftw=True):
         return y
 
     def _reshaped_apply(x):
-        singleton = (x.ndim == 1)
+        singleton = x.ndim == 1
 
         if singleton:
             x = x[np.newaxis, ...]
@@ -124,7 +132,7 @@ def concentration_op(mask, W=1 / 4, use_fftw=True):
 
 def tensor_tapers(sig_shape, W=1 / 4):
     if not isinstance(sig_shape, tuple):
-        sig_shape = (sig_shape, )
+        sig_shape = (sig_shape,)
 
     d = len(sig_shape)
 
@@ -132,12 +140,13 @@ def tensor_tapers(sig_shape, W=1 / 4):
 
     h = np.ones((1,) * (2 * d), dtype=np.float64)
 
-    K = np.round(np.array(sig_shape) * W).astype('int')
+    K = np.round(np.array(sig_shape) * W).astype("int")
 
     for ell in range(d):
         if K[ell] > 0:
-            h_ell = dpss(sig_shape[ell], sig_shape[ell] * W[ell] / 2,
-                         Kmax=K[ell], norm=2)
+            h_ell = dpss(
+                sig_shape[ell], sig_shape[ell] * W[ell] / 2, Kmax=K[ell], norm=2
+            )
         else:
             # If K is too small, just use constant taper (so we get the
             # periodogram).
@@ -145,19 +154,22 @@ def tensor_tapers(sig_shape, W=1 / 4):
 
         # Move first and second axes into ellth and (d + ell)th,
         # respectively.
-        h_ell = np.reshape(h_ell, (1,) * ell
-                           + (K[ell],)
-                           + (1,) * (d - ell - 1)
-                           + (1,) * ell
-                           + (sig_shape[ell],)
-                           + (1, ) * (d - ell - 1))
+        h_ell = np.reshape(
+            h_ell,
+            (1,) * ell
+            + (K[ell],)
+            + (1,) * (d - ell - 1)
+            + (1,) * ell
+            + (sig_shape[ell],)
+            + (1,) * (d - ell - 1),
+        )
 
         h = h * h_ell
 
     taper_shape = h.shape[:d]
     taper_len = np.prod(taper_shape)
 
-    h = np.reshape(h, (taper_len, ) + sig_shape)
+    h = np.reshape(h, (taper_len,) + sig_shape)
 
     return h
 
@@ -166,7 +178,7 @@ def corner_tapers(mask, W=1 / 4):
     d = mask.ndim
 
     if not d == 2:
-        raise RuntimeError('Only implemented for 2D signals.')
+        raise RuntimeError("Only implemented for 2D signals.")
 
     N1, N2, N3, N4 = _fit_corner_mask(mask)
 
@@ -175,31 +187,30 @@ def corner_tapers(mask, W=1 / 4):
     tapers3 = tensor_tapers((N3,) * 2, W=W)
     tapers4 = tensor_tapers((N4,) * 2, W=W)
 
-    taper_len = (tapers1.shape[0]
-                 + tapers2.shape[0]
-                 + tapers3.shape[0]
-                 + tapers4.shape[0])
+    taper_len = (
+        tapers1.shape[0] + tapers2.shape[0] + tapers3.shape[0] + tapers4.shape[0]
+    )
 
     tapers = np.zeros((taper_len,) + mask.shape, dtype=tapers1.dtype)
 
     idx = 0
 
-    tapers[idx:idx + tapers1.shape[0], :N1, :N1] = tapers1
+    tapers[idx : idx + tapers1.shape[0], :N1, :N1] = tapers1
     idx += tapers1.shape[0]
 
-    tapers[idx:idx + tapers2.shape[0], -N2:, :N2] = tapers2
+    tapers[idx : idx + tapers2.shape[0], -N2:, :N2] = tapers2
     idx += tapers2.shape[0]
 
-    tapers[idx:idx + tapers3.shape[0], -N3:, -N3:] = tapers3
+    tapers[idx : idx + tapers3.shape[0], -N3:, -N3:] = tapers3
     idx += tapers3.shape[0]
 
-    tapers[idx:idx + tapers4.shape[0], :N4, -N4:] = tapers4
+    tapers[idx : idx + tapers4.shape[0], :N4, -N4:] = tapers4
 
     return tapers
 
 
 def _orthogonalize(X):
-    Q, _ = qr(X.T, mode='economic', check_finite=False, overwrite_a=True)
+    Q, _ = qr(X.T, mode="economic", check_finite=False, overwrite_a=True)
     return Q.T
 
 
@@ -262,10 +273,10 @@ def _ensure_W(W, d):
     if W.shape[0] == 1:
         W = W.repeat(d)
     elif W.shape[0] != d:
-        raise TypeError('Bandwidth W must have 1 or d elements.')
+        raise TypeError("Bandwidth W must have 1 or d elements.")
 
     if any(W >= 1):
-        raise ValueError('Bandwidth W must be strictly smaller than 1.')
+        raise ValueError("Bandwidth W must be strictly smaller than 1.")
 
     return W
 
