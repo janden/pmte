@@ -66,3 +66,37 @@ def test_concentation_op_sinc_2d(N, M, W, use_fftw):
 
     # Test singleton apply.
     assert np.allclose(op(np.eye(N * M)[:, 0]), A_true[:, 0])
+
+
+@pytest.mark.parametrize("N", [7, 8])
+@pytest.mark.parametrize("W", [1/16, 1/4, 1/3, 1])
+def test_tensor_tapers_1d(N, W):
+    h = tapers.tensor_tapers(N, W=W)
+
+    K = round(N * W)
+
+    if W == 1:
+        h_true = np.eye(N)
+    elif K > 0:
+        h_true = scipy.signal.windows.dpss(N, N * W / 2, Kmax=K, norm=2)
+    else:
+        h_true = 1 / np.sqrt(N) * np.ones((1, N))
+
+    assert np.allclose(h, h_true)
+
+
+@pytest.mark.parametrize("N, M", [(7, 7), (7, 8), (8, 8)])
+@pytest.mark.parametrize("W", [(1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
+def test_tensor_tapers_2d(N, M, W):
+    h = tapers.tensor_tapers((N, M), W=W)
+
+    K1 = round(N * W[0])
+    K2 = round(M * W[1])
+
+    h1_true = scipy.signal.windows.dpss(N, N * W[0] / 2, Kmax=K1, norm=2)
+    h2_true = scipy.signal.windows.dpss(M, M * W[1] / 2, Kmax=K2, norm=2)
+
+    h_true = h1_true[:, None, :, None] * h2_true[None, :, None, :]
+    h_true = h_true.reshape((K1 * K2, N, M))
+
+    assert np.allclose(h, h_true)
