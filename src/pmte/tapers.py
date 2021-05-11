@@ -216,11 +216,6 @@ def corner_tapers(mask, W=1 / 4):
     return tapers
 
 
-def _orthogonalize(X):
-    Q, _ = qr(X.T, mode="economic", check_finite=False, overwrite_a=True)
-    return Q.T
-
-
 def proxy_tapers(mask, W=1 / 4, n_iter=8, K=None, rng=None, use_fftw=True):
     if rng is None:
         rng = np.random.default_rng()
@@ -302,3 +297,8 @@ def _fit_corner_mask(mask):
     N4 = last_true(np.diag(np.flip(mask, 1)))
 
     return (N1, N2, N3, N4)
+
+
+def _orthogonalize(X):
+    Q, _ = qr(X.T, mode="economic", check_finite=False, overwrite_a=True)
+    return Q.T
