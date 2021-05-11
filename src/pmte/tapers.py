@@ -3,7 +3,7 @@ from scipy.fft import fftn, ifftn
 from scipy.linalg import qr
 from scipy.signal.windows import dpss
 
-from pmte import _internal
+from pmte import _internal, util
 
 
 def concentration_op(mask, W=1 / 4, use_fftw=True):
@@ -22,8 +22,7 @@ def concentration_op(mask, W=1 / 4, use_fftw=True):
 
     two_sig_sz = tuple(2 * sz for sz in sig_sz)
 
-    rngs = [sz * np.fft.fftfreq(sz) for sz in two_sig_sz]
-    grids = np.meshgrid(*rngs, indexing="ij")
+    grids = util.grid(two_sig_sz, normalized=False)
 
     sinc_kernel = np.ones(two_sig_sz)
 
