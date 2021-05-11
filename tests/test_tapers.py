@@ -100,3 +100,53 @@ def test_tensor_tapers_2d(N, M, W):
     h_true = h_true.reshape((K1 * K2, N, M))
 
     assert np.allclose(h, h_true)
+
+@pytest.mark.parametrize("N, M", [(7, 7), (7, 8), (8, 8)])
+@pytest.mark.parametrize("W", [(1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
+def test_corner_tapers(N, M, W):
+    grid = util.grid((N, M), shifted=True)
+    mask = np.hypot(grid[0], grid[1]) > 0.25
+
+    h = tapers.corner_tapers(mask, W=W)
+
+    corner_mask = np.any(np.abs(h) > 0, axis=0)
+
+    N1 = np.argmax(~corner_mask[:, 0])
+    N2 = np.argmax(~corner_mask[::-1, 0])
+    N3 = np.argmax(~corner_mask[-1, ::-1])
+    N4 = np.argmax(~corner_mask[0, ::-1])
+
+    h = h.reshape((h.shape[0], N * M))
+
+    h1 = tapers.tensor_tapers((N1,) * 2, W=W)
+    h1 = np.pad(h1, ((0, 0), (0, N - N1), (0, M - N1)))
+    h1 = h1.reshape((h1.shape[0], N * M))
+
+    assert np.allclose(h1, (h1 @ h.T) @ h)
+
+    h2 = tapers.tensor_tapers((N2,) * 2, W=W)
+    h2 = np.pad(h2, ((0, 0), (N - N2, 0), (0, M - N2)))
+    h2 = h2.reshape((h1.shape[0], N * M))
+
+    assert np.allclose(h2, (h2 @ h.T) @ h)
+
+    h3 = tapers.tensor_tapers((N3,) * 2, W=W)
+    h3 = np.pad(h3, ((0, 0), (N - N3, 0), (M - N3, 0)))
+    h3 = h3.reshape((h3.shape[0], N * M))
+
+    assert np.allclose(h3, (h3 @ h.T) @ h)
+
+    h4 = tapers.tensor_tapers((N4,) * 2, W=W)
+    h4 = np.pad(h4, ((0, 0), (0, N - N4), (M - N4, 0)))
+    h4 = h4.reshape((h4.shape[0], N * M))
+
+    assert np.allclose(h4, (h4 @ h.T) @ h)
+
+
+def test_corner_tapers_error():
+    mask = np.full((4,), True)
+
+    with pytest.raises(TypeError) as e:
+        _ = tapers.corner_tapers(mask, W=1/4)
+
+    assert "for 2D signals" in str(e.value)
