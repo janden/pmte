@@ -68,6 +68,23 @@ def test_concentation_op_sinc_2d(N, M, W, use_fftw):
     assert np.allclose(op(np.eye(N * M)[:, 0]), A_true[:, 0])
 
 
+def test_concentration_op_errors():
+    mask = np.full((4,), True)
+    W = [0.25, 0.5]
+
+    with pytest.raises(TypeError) as e:
+        tapers.concentration_op(mask, W=W)
+
+    assert "must have 1 or d elements" in str(e.value)
+
+    W = 1.1
+
+    with pytest.raises(ValueError) as e:
+        tapers.concentration_op(mask, W=W)
+
+    assert "smaller than or equal to 1" in str(e.value)
+
+
 @pytest.mark.parametrize("N", [7, 8])
 @pytest.mark.parametrize("W", [1/16, 1/4, 1/3, 1])
 def test_tensor_tapers_1d(N, W):
