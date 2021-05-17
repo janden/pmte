@@ -149,7 +149,10 @@ def tensor_tapers(sig_shape, W=1 / 4):
                 h_ell = np.eye(sig_shape[ell])
             else:
                 h_ell = dpss(
-                    sig_shape[ell], sig_shape[ell] * W[ell] / 2, Kmax=K[ell], norm=2
+                    sig_shape[ell],
+                    sig_shape[ell] * W[ell] / 2,
+                    Kmax=K[ell],
+                    norm=2,
                 )
         else:
             # If K is too small, just use constant taper (so we get the
