@@ -1,3 +1,5 @@
+import os
+import sys
 import numpy as np
 import scipy.linalg
 
@@ -253,3 +255,17 @@ def test_spectral_window_2d(N, M, W, shifted):
 
     assert np.all(rho[lowpass] > 0.5)
     assert np.all(rho[highpass] < 0.5)
+
+
+def test_missing_pyfftw(monkeypatch):
+    dirname = os.path.dirname(os.path.abspath(__file__))
+
+    monkeypatch.syspath_prepend(os.path.join(dirname, 'fake_modules'))
+    monkeypatch.delitem(sys.modules, "pyfftw")
+
+    mask = np.full((8,), True)
+
+    with pytest.warns(UserWarning) as record:
+        tapers.concentration_op(mask)
+
+    assert "Failed to import pyFFTW" in str(record[0].message)
