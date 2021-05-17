@@ -45,12 +45,15 @@ def test_concentation_op_sinc_1d(N, W, use_fftw):
 
 
 @pytest.mark.parametrize("N, M", [(4, 4), (4, 5)])
-@pytest.mark.parametrize("W", [(1 / 2, 1 / 2), (1 / 2, 1 / 3), (1 / 3, 1 / 3)])
+@pytest.mark.parametrize("W", [1 / 2, (1 / 2, 1 / 2), (1 / 2, 1 / 3), (1 / 3, 1 / 3)])
 @pytest.mark.parametrize("use_fftw", [True, False])
 def test_concentation_op_sinc_2d(N, M, W, use_fftw):
     mask = np.full((N, M), True)
     op = tapers.concentration_op(mask, W=W, use_fftw=use_fftw)
     A = op(np.eye(N * M))
+
+    if isinstance(W, float):
+        W = W * np.ones(2)
 
     grid1 = util.grid((2 * N,), normalized=False)
     sinc1 = W[0] * np.sinc(W[0] * grid1[0])
@@ -103,12 +106,15 @@ def test_tensor_tapers_1d(N, W):
 
 
 @pytest.mark.parametrize("N, M", [(7, 7), (7, 8), (8, 8)])
-@pytest.mark.parametrize("W", [(1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
+@pytest.mark.parametrize("W", [1/4, (1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
 def test_tensor_tapers_2d(N, M, W):
     h = tapers.tensor_tapers((N, M), W=W)
 
-    K1 = round(N * W[0])
-    K2 = round(M * W[1])
+    if isinstance(W, float):
+        W = W * np.ones(2)
+
+    K1 = int(round(N * W[0]))
+    K2 = int(round(M * W[1]))
 
     h1_true = scipy.signal.windows.dpss(N, N * W[0] / 2, Kmax=K1, norm=2)
     h2_true = scipy.signal.windows.dpss(M, M * W[1] / 2, Kmax=K2, norm=2)
@@ -119,7 +125,7 @@ def test_tensor_tapers_2d(N, M, W):
     assert np.allclose(h, h_true)
 
 @pytest.mark.parametrize("N, M", [(7, 7), (7, 8), (8, 8)])
-@pytest.mark.parametrize("W", [(1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
+@pytest.mark.parametrize("W", [1/4, (1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
 def test_corner_tapers(N, M, W):
     grid = util.grid((N, M), shifted=True)
     mask = np.hypot(grid[0], grid[1]) > 0.25
@@ -183,7 +189,7 @@ def test_proxy_tapers_rect_1d(N, W):
 
 
 @pytest.mark.parametrize("N, M", [(7, 7), (7, 8), (8, 8)])
-@pytest.mark.parametrize("W", [(1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
+@pytest.mark.parametrize("W", [1/4, (1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
 def test_proxy_tapers_rect_2d(N, M, W):
     mask = np.full((N, M), True)
 
@@ -199,11 +205,14 @@ def test_proxy_tapers_rect_2d(N, M, W):
 
 
 @pytest.mark.parametrize("N, M", [(7, 7), (7, 8), (8, 8)])
-@pytest.mark.parametrize("W", [(1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
+@pytest.mark.parametrize("W", [1 / 2, (1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
 def test_proxy_tapers_defaults(N, M, W):
     mask = np.full((N, M), True)
 
     h = tapers.proxy_tapers(mask, W=W)
+
+    if isinstance(W, float):
+        W = W * np.ones(2)
 
     K = int(np.ceil(N * M * W[0] * W[1]))
 
