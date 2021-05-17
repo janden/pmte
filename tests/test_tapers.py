@@ -196,3 +196,15 @@ def test_proxy_tapers_rect_2d(N, M, W):
     h_true = h_true.reshape(h.shape[0], -1)
 
     assert np.isclose(np.max(scipy.linalg.subspace_angles(h, h_true)), 0)
+
+
+@pytest.mark.parametrize("N, M", [(7, 7), (7, 8), (8, 8)])
+@pytest.mark.parametrize("W", [(1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
+def test_proxy_tapers_defaults(N, M, W):
+    mask = np.full((N, M), True)
+
+    h = tapers.proxy_tapers(mask, W=W)
+
+    K = int(np.ceil(N * M * W[0] * W[1]))
+
+    assert h.shape[0] == K
