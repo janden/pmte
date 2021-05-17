@@ -167,3 +167,32 @@ def test_corner_tapers_error():
         _ = tapers.corner_tapers(mask, W=1/4)
 
     assert "for 2D signals" in str(e.value)
+
+
+@pytest.mark.parametrize("N", [7, 8])
+@pytest.mark.parametrize("W", [1/16, 1/4, 1/3, 1])
+def test_proxy_tapers_rect_1d(N, W):
+    mask = np.full((N,), True)
+
+    h_true = tapers.tensor_tapers((N,), W=W)
+    K = h_true.shape[0]
+
+    h = tapers.proxy_tapers(mask, W=W, K=K)
+
+    assert np.isclose(np.max(scipy.linalg.subspace_angles(h, h_true)), 0)
+
+
+@pytest.mark.parametrize("N, M", [(7, 7), (7, 8), (8, 8)])
+@pytest.mark.parametrize("W", [(1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
+def test_proxy_tapers_rect_2d(N, M, W):
+    mask = np.full((N, M), True)
+
+    h_true = tapers.tensor_tapers((N, M), W=W)
+    K = h_true.shape[0]
+
+    h = tapers.proxy_tapers(mask, W=W, K=K)
+
+    h = h.reshape(h.shape[0], -1)
+    h_true = h_true.reshape(h.shape[0], -1)
+
+    assert np.isclose(np.max(scipy.linalg.subspace_angles(h, h_true)), 0)
