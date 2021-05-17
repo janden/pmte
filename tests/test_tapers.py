@@ -217,3 +217,39 @@ def test_proxy_tapers_defaults(N, M, W):
     K = int(np.ceil(N * M * W[0] * W[1]))
 
     assert h.shape[0] == K
+
+
+@pytest.mark.parametrize("N", [15, 16])
+@pytest.mark.parametrize("W", [1/16, 1/4, 1/3, 1])
+@pytest.mark.parametrize("shifted", [True, False])
+def test_spectral_window_1d(N, W, shifted):
+    h = tapers.tensor_tapers(N, W=W)
+
+    rho = W * tapers.spectral_window(h, shifted=shifted)
+
+    grid = util.grid(N, shifted=shifted)
+
+    lowpass = np.abs(grid[0]) < W / 2
+    highpass = np.abs(grid[0]) > W / 2
+
+    assert np.all(rho[lowpass] > 0.5)
+    assert np.all(rho[highpass] < 0.5)
+
+@pytest.mark.parametrize("N, M", [(16, 16), (15, 16), (15, 15)])
+@pytest.mark.parametrize("W", [1 / 2, (1/4, 1/4), (1/4, 1/3), (1/3, 1/3)])
+@pytest.mark.parametrize("shifted", [True, False])
+def test_spectral_window_2d(N, M, W, shifted):
+    h = tapers.tensor_tapers((N, M), W=W)
+
+    rho = np.prod(W) * tapers.spectral_window(h, shifted=shifted)
+
+    grid = util.grid((N, M), shifted=shifted)
+
+    if isinstance(W, float):
+        W = W * np.ones(2)
+
+    lowpass = (np.abs(grid[0]) < W[0] / 2) & (np.abs(grid[1]) < W[1] / 2)
+    highpass = (np.abs(grid[0]) > W[0] / 2) & (np.abs(grid[1]) > W[1] / 2)
+
+    assert np.all(rho[lowpass] > 0.5)
+    assert np.all(rho[highpass] < 0.5)
