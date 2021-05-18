@@ -144,22 +144,15 @@ def tensor_tapers(sig_shape, W=1 / 4):
     K = np.ceil(np.array(sig_shape) * W).astype("int")
 
     for ell in range(d):
-        if K[ell] > 0:
-            if W[ell] == 1:
-                h_ell = np.eye(sig_shape[ell])
-            else:
-                h_ell = dpss(
-                    sig_shape[ell],
-                    sig_shape[ell] * W[ell] / 2,
-                    Kmax=K[ell],
-                    norm=2,
-                )
+        if W[ell] == 1:
+            h_ell = np.eye(sig_shape[ell])
         else:
-            # If K is too small, just use constant taper (so we get the
-            # periodogram).
-            h_ell = 1 / np.sqrt(sig_shape[ell]) * np.ones((1, sig_shape[ell]))
-
-            K[ell] = 1
+            h_ell = dpss(
+                sig_shape[ell],
+                sig_shape[ell] * W[ell] / 2,
+                Kmax=K[ell],
+                norm=2,
+            )
 
         # Move first and second axes into ellth and (d + ell)th,
         # respectively.
