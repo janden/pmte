@@ -8,6 +8,10 @@ import pytest
 from pmte import tapers, util
 
 
+def _max_subspace_angle(Q1, Q2):
+    return np.max(scipy.linalg.subspace_angles(Q1.T, Q2.T))
+
+
 @pytest.mark.parametrize("N", [4, 5])
 @pytest.mark.parametrize("use_fftw", [True, False])
 def test_concentration_op_identity_1d(N, use_fftw):
@@ -183,11 +187,11 @@ def test_corner_tapers_error():
 def test_proxy_tapers_rect_1d(N, W):
     mask = np.full((N,), True)
 
-    h = tapers.proxy_tapers(mask, W=W)
+    h = tapers.proxy_tapers(mask, W=W, n_iter=64)
 
     h_true = tapers.tensor_tapers((N,), W=W)
 
-    assert np.isclose(np.max(scipy.linalg.subspace_angles(h, h_true)), 0)
+    assert np.isclose(_max_subspace_angle(h, h_true), 0)
 
 
 @pytest.mark.parametrize("N, M", [(7, 7), (7, 8), (8, 8)])
@@ -198,12 +202,12 @@ def test_proxy_tapers_rect_2d(N, M, W):
     h_true = tapers.tensor_tapers((N, M), W=W)
     K = h_true.shape[0]
 
-    h = tapers.proxy_tapers(mask, W=W, K=K)
+    h = tapers.proxy_tapers(mask, W=W, K=K, n_iter=64)
 
     h = h.reshape(h.shape[0], -1)
     h_true = h_true.reshape(h.shape[0], -1)
 
-    assert np.isclose(np.max(scipy.linalg.subspace_angles(h, h_true)), 0)
+    assert np.isclose(_max_subspace_angle(h, h_true), 0)
 
 
 @pytest.mark.parametrize("N, M", [(7, 7), (7, 8), (8, 8)])
