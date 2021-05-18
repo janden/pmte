@@ -211,6 +211,25 @@ def test_proxy_tapers_rect_2d(N, M, W):
 
 
 @pytest.mark.parametrize("N, M", [(7, 7), (7, 8), (8, 8)])
+@pytest.mark.parametrize("W", [1 / 4, (1 / 4, 1 / 4), (1 / 4, 1 / 3), (1 / 3, 1 / 3)])
+@pytest.mark.parametrize("mask_r", [1 / 3, 1 / 2])
+def test_proxy_tapers_disk_2d(N, M, W, mask_r):
+    x, y = util.grid((N, M), shifted=True)
+    r = np.hypot(x, y)
+
+    mask = r < mask_r
+
+    op = tapers.concentration_op(mask, W=W)
+    h = tapers.proxy_tapers(mask, W=W, n_iter=512)
+
+    h = h.reshape(h.shape[0], -1)
+
+    op_h = op(h)
+
+    assert np.isclose(_max_subspace_angle(h, op_h), 0)
+
+
+@pytest.mark.parametrize("N, M", [(7, 7), (7, 8), (8, 8)])
 @pytest.mark.parametrize("W", [1 / 2, (1 / 4, 1 / 4), (1 / 4, 1 / 3), (1 / 3, 1 / 3)])
 def test_proxy_tapers_defaults(N, M, W):
     mask = np.full((N, M), True)
