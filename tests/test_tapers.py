@@ -95,7 +95,7 @@ def test_concentration_op_errors():
 def test_tensor_tapers_1d(N, W):
     h = tapers.tensor_tapers(N, W=W)
 
-    K = round(N * W)
+    K = int(np.ceil(N * W))
 
     if W == 1:
         h_true = np.eye(N)
@@ -115,8 +115,8 @@ def test_tensor_tapers_2d(N, M, W):
     if isinstance(W, float):
         W = W * np.ones(2)
 
-    K1 = int(round(N * W[0]))
-    K2 = int(round(M * W[1]))
+    K1 = int(np.ceil(N * W[0]))
+    K2 = int(np.ceil(M * W[1]))
 
     h1_true = scipy.signal.windows.dpss(N, N * W[0] / 2, Kmax=K1, norm=2)
     h2_true = scipy.signal.windows.dpss(M, M * W[1] / 2, Kmax=K2, norm=2)
@@ -182,10 +182,9 @@ def test_corner_tapers_error():
 def test_proxy_tapers_rect_1d(N, W):
     mask = np.full((N,), True)
 
-    h_true = tapers.tensor_tapers((N,), W=W)
-    K = h_true.shape[0]
+    h = tapers.proxy_tapers(mask, W=W)
 
-    h = tapers.proxy_tapers(mask, W=W, K=K)
+    h_true = tapers.tensor_tapers((N,), W=W)
 
     assert np.isclose(np.max(scipy.linalg.subspace_angles(h, h_true)), 0)
 
