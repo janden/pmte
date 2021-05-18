@@ -141,7 +141,7 @@ def tensor_tapers(sig_shape, W=1 / 4):
 
     h = np.ones((1,) * (2 * d), dtype=np.float64)
 
-    K = np.round(np.array(sig_shape) * W).astype("int")
+    K = np.ceil(np.array(sig_shape) * W).astype("int")
 
     for ell in range(d):
         if K[ell] > 0:
