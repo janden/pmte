@@ -2,3 +2,4 @@ numpy
 scipy
 pyfftw
 matplotlib
+pytest
