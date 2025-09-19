@@ -6,4 +6,8 @@ results/
 
 .ipynb_checkpoints
 
+notebooks/*.py
+!notebooks/_preamble.py
+!notebooks/helpers.py
+
 *.png
