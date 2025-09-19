@@ -4,4 +4,6 @@ __pycache__
 data/
 results/
 
+.ipynb_checkpoints
+
 *.png
