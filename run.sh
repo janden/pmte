@@ -1,3 +1,4 @@
+#/usr/bin/env bash
 set -e
 
 PYTHONPATH="${PYTHONPATH}:${PWD}/src" python3 -m pytest
